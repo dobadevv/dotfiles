@@ -1,0 +1,49 @@
+customCommands:
+  - key: 'C'
+    description: 'Add description for this branch'
+    command: 'git config branch.{{.SelectedLocalBranch.Name}}.description "{{.Form.Description}}"'
+    context: 'localBranches'
+    prompts:
+      - type: 'input'
+        title: 'Branch Description'
+        key: 'Description'
+  - key: 'D'
+    description: 'Branch description'
+    outputTitle: 'Branch Description'
+    command: 'git config branch.{{.SelectedLocalBranch.Name}}.description || echo "No description set"'
+    context: 'localBranches'
+    output: popup
+  - key: 'B'
+    description: 'Show all local branches with description'
+    outputTitle: 'Branches Description'
+    command: 'git branches-desc'
+    context: 'localBranches'
+    output: popup
+  - key: '<C-p>'
+    description: 'Pull for all local branches'
+    command: 'git pa'
+    context: 'localBranches'
+gui:
+  theme:
+    activeBorderColor:
+      - '#b4befe'
+      - bold
+    inactiveBorderColor:
+      - '#a6adc8'
+    optionsTextColor:
+      - '#89b4fa'
+    selectedLineBgColor:
+      - '#313244'
+    cherryPickedCommitBgColor:
+      - '#45475a'
+    cherryPickedCommitFgColor:
+      - '#b4befe'
+    unstagedChangesColor:
+      - '#f38ba8'
+    defaultFgColor:
+      - '#cdd6f4'
+    searchingActiveBorderColor:
+      - '#f9e2af'
+
+  authorColors:
+    '*': '#b4befe'

@@ -1,0 +1,46 @@
+[user]
+	name = dobadev
+	email = doba.fullstack@gmail.com
+[init]
+	defaultBranch = main
+[core]
+	excludesfile = /Users/doba/.gitignore_global
+	autocrlf = input
+    pager = delta
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[commit]
+	template = /Users/doba/.stCommitMsg
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[alias]
+    mr = !sh -c 'git fetch $1 merge-requests/$2/head:mr-$1-$2 && git checkout mr-$1-$2'
+    h = !sh -c 'git reflog show --date=iso $(git branch --show-current)'
+    lt = "!git tag --sort=-v:refname | grep -E '^v[0-9]+\\.[0-9]+\\.[0-9]+-dev$' | head -n 1"
+    pa = "!f() { current=$(git branch --show-current); for b in $(git branch --format=\"%(refname:short)\"); do if git rev-parse --abbrev-ref \"$b@{upstream}\" >/dev/null 2>&1; then echo \"Updating $b...\"; git checkout \"$b\" && git pull --rebase; else echo \"Skipping $b (no upstream)\"; fi; done; git checkout \"$current\"; }; f"
+    mr = "!f() { git fetch origin merge-requests/$1/head:merge-request/$1 && git checkout merge-request/$1; }; f"
+	branches-desc = "!git branch --format=\"%(refname:short)\" | while read branch; do desc=$(git config branch.\"$branch\".description); printf \"%-30s %s\\n\" \"$branch\" \"${desc:-(no description)}\"; done"
+
+[push]
+	autoSetupRemote = true
+[interactive]
+    diffFilter = delta --color-only
+[include]
+	path = ~/.config/delta/themes/catppuccin.gitconfig
+[delta]
+    navigate = true    # use n and N to move between diff sections
+    side-by-side = true
+    line-numbers = true
+    features = catppuccin-mocha
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default

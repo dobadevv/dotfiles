@@ -1,0 +1,330 @@
+# Internal
+alias e='exit'
+alias c='clear'
+alias r='source ~/.zshrc'
+alias myip="ifconfig | grep -o '192\.168\.68\.[0-9]\+' | grep -v '192\.168\.68\.255'"
+alias mobile_service="echo 'http://$(myip):4301'"
+alias n="nvim"
+alias ls="eza --icons=always -a"
+alias cd="z"
+alias cat="bat"
+alias lzs="lazysql"
+
+# Load environment from a dotfile
+function load() {
+    set -a
+    source $1
+    set +a
+}
+
+# JQ
+function j2q() {
+  echo "$1" | jq -r 'to_entries | map("\(.key)=\(.value|@uri)") | join("&")'
+}
+
+function q2j() {
+  echo "$1" | awk -F '[=&]' '{
+       printf "{";
+       for (i=1; i<=NF; i+=2) {
+         if (i>1) printf ",";
+         printf "\"%s\":\"%s\"", $i, $(i+1);
+       }
+       printf "}\n";
+     }' | sed 's/+/ /g' | jq .
+}
+
+# Yazi
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
+
+# Nodejs
+alias pn='pnpm'
+alias now='node -e "console.log(new Date().toISOString())"'
+alias tsgo='/Users/doba/typescript-go/built/local/tsgo'
+
+function index_ts() {
+  # Check if directory is provided
+  if [ -z "$1" ]; then
+    echo "Usage: export_files <directory>"
+    return 1
+  fi
+
+  # Check if directory exists
+  if [ ! -d "$1" ]; then
+    echo "Error: Directory '$1' does not exist."
+    return 1
+  fi
+
+  # Collect all file names and format them
+  find "$1" -type f \( -name '*.ts' -o -name '*.tsx' \) -not -name 'index.ts' | while read -r filepath; do
+    # Get the relative path by stripping the base directory
+    relative_path="${filepath#$1/}" # Removes the base directory path from the file path
+    # Remove the extension and output the desired pattern
+    echo "export * from './${relative_path%.*}';"
+  done
+
+}
+
+# Docker
+alias dp='docker ps'
+alias di='docker images'
+alias dr='docker rm'
+alias dri='docker rmi'
+alias lzd='lazydocker'
+alias dcu='docker compose up -d --build && drni'
+alias dcd='docker compose down'
+
+function drni() {
+    docker images --filter "dangling=true" -q --no-trunc | xargs -r docker rmi
+}
+
+# Git
+alias lg='lazygit'
+alias g='git'
+alias gp='git push'
+alias gpt='git push --tag'
+alias gpl='git pull'
+alias gc='git checkout'
+alias gb='git branch'
+alias gs='git status'
+alias cz='cz --name cz_ai commit'
+
+function release() {
+    # Parse flags
+    local interactive=false
+    local confirm_tag=false
+    local version_type="patch"
+    local branch=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -i|--interactive)
+                interactive=true
+                shift
+                ;;
+            -c|--confirm)
+                confirm_tag=true
+                shift
+                ;;
+            -t|--type)
+                version_type="$2"
+                shift 2
+                ;;
+            -b|--branch)
+                branch="$2"
+                shift 2
+                ;;
+            *)
+                shift
+                ;;
+        esac
+    done
+
+    # Check if we're in a git repository
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        echo "Error: Not a git repository"
+        return 1
+    fi
+
+    # Branch selection (skip if branch already specified)
+    if [[ -z "$branch" ]]; then
+        local branches=("dev" "test" "uat" "main")
+        echo "Which branch:"
+        select branch in "${branches[@]}"; do
+            if [[ -n "$branch" ]]; then
+                echo "Selected branch: $branch"
+                break
+            fi
+        done
+    fi
+
+    # Checkout selected branch
+    git checkout "$branch" 2>/dev/null || {
+        echo "Error: Failed to checkout branch $branch"
+        return 1
+    }
+    # Pull latest Changes
+    git pull origin "$branch"
+
+    # Version type selection (only if interactive)
+    if [[ "$interactive" == true ]]; then
+        echo "\nWhich type:"
+        local types=("major" "minor" "patch")
+        select version_type in "${types[@]}"; do
+            if [[ -n "$version_type" ]]; then
+                echo "Selected type: $version_type"
+                break
+            fi
+        done
+    fi
+
+    # Get latest tag for this branch
+    local latest_tag=$(git tag -l "v*-$branch" --sort=-v:refname | head -n 1)
+
+    if [[ -z "$latest_tag" ]]; then
+        # No tag exists, start with v0.0.0
+        latest_tag="v0.0.0-$branch"
+        echo "No previous tag found, starting from $latest_tag"
+    fi
+
+    # Parse version numbers
+    local version_part="${latest_tag#v}"
+    version_part="${version_part%-$branch}"
+
+    local major minor patch
+    IFS='.' read -r major minor patch <<< "$version_part"
+
+    # Increment version based on type
+    case "$version_type" in
+        major)
+            ((major++))
+            minor=0
+            patch=0
+            ;;
+        minor)
+            ((minor++))
+            patch=0
+            ;;
+        patch)
+            ((patch++))
+            ;;
+    esac
+
+    local new_tag="v${major}.${minor}.${patch}-${branch}"
+
+    # Get current date and time
+    local current_date=$(date '+%d/%m/%Y %H:%M:%S')
+
+    # Get git user name
+    local git_author=$(git config user.name)
+
+    # Get commit messages from previous tag to HEAD (excluding merges)
+    local changes
+    if git rev-parse "$latest_tag" >/dev/null 2>&1; then
+        changes=$(git log "$latest_tag..HEAD" --no-merges --pretty=format:"- %s")
+    else
+        changes=$(git log --no-merges --pretty=format:"- %s")
+    fi
+
+    if [[ -z "$changes" ]]; then
+        changes="- No new commits since last tag"
+    fi
+
+    # Build complete description
+    local description="Date: ${current_date}
+Author: ${git_author}
+Branch: ${branch}
+
+Changes:
+${changes}"
+
+    # Show all information
+    echo "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Your latest tag is: $latest_tag"
+    echo "New tag will be: $new_tag"
+    echo "\nTag description:"
+    echo "$description"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    # Confirm before creating tag (only if confirm flag is set)
+    if [[ "$confirm_tag" == true ]]; then
+        echo "\nDo you want to create this tag? (y/n)"
+        read -r confirm
+        if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+            echo "Tag creation cancelled"
+            return 0
+        fi
+    fi
+
+    # Create annotated tag with description
+    git tag -a "$new_tag" -m "$description"
+
+    if [[ $? -eq 0 ]]; then
+        echo "\n✓ Tag $new_tag created successfully!"
+        # Ask to push the tag
+        echo "Do you want to push the tag to remote? (y/n)"
+        read -r push_confirm
+        if [[ "$push_confirm" == "y" || "$push_confirm" == "Y" ]]; then
+            git push origin "$new_tag"
+            if [[ $? -eq 0 ]]; then
+                echo "✓ Tag $new_tag pushed to remote successfully!"
+            else
+                echo "Error: Failed to push tag to remote"
+                return 1
+            fi
+        else
+            echo "Tag not pushed to remote"
+        fi
+    else
+        echo "Error: Failed to create tag"
+        return 1
+    fi
+}
+
+function release_dev() {
+    release -b dev "$@"
+}
+
+function release_test() {
+    release -b test "$@"
+}
+
+function release_both() {
+    release -b dev "$@"
+    release -b test "$@"
+}
+
+function merge_test() {
+  # Get current branch name
+  local current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+  # Hard-coded values
+  local target_branch="test"
+  local mr_title="Merge pre-test to test"
+  local mr_description="Auto-generated MR"
+
+  # Create MR and capture the output
+  local mr_output=$(glab mr create \
+    --source-branch "$current_branch" \
+    --target-branch "$target_branch" \
+    --title "$mr_title" \
+    --description "$mr_description" \
+    --remove-source-branch \
+    --yes)
+  echo $mr_output
+
+  # Extract MR URL and open in browser
+  local mr_url=$(echo "$mr_output" | grep -oE 'https://[^ ]+')
+  if [[ -n "$mr_url" ]]; then
+    open "$mr_url"
+  fi
+
+  git checkout test
+  git branch -d pre-test
+}
+
+# Kubernetes
+alias kube='kubectl'
+
+# Python
+alias django='python3 manage.py'
+
+# Finviet
+alias restore_dms_report='/Users/doba/FV/backup-database/dms_report.sh'
+alias restore_dms_salesman='/Users/doba/FV/backup-database/dms_salesman.sh'
+alias restore_dms='restore_dms_report & restore_dms_salesman'
+alias ndt="git for-each-ref --sort=-creatordate --format '%(refname:short)' refs/tags | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-dev$' | head -n 1"
+
+# Tmux
+function tmuxall() {
+    for file in ~/.config/tmuxinator/*.yaml; do tmuxinator start "$(basename "$file" .yaml)" --no-attach; done
+}
+alias txa='tmux attach -t dotfiles'
+
+# nvim
+alias reset_nvim_session='rm -rf /Users/doba/.local/share/nvim/sessions/*'
