@@ -1,0 +1,16 @@
+.config/cagent
+.config/fish
+.config/gh
+.config/git
+.config/github-copilot
+.config/htop
+.config/jgit
+.config/linearmouse
+.config/nvim/lazy-lock.json
+.config/raycast
+.config/tmux
+.config/tmuxinator
+.config/uv
+.config/zed
+
+.zshrc.secret
