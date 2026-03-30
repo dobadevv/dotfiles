@@ -119,7 +119,7 @@ vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 -- Lazy tools
 vim.keymap.set("n", "<leader>lg", "<CMD>LazyGit<CR>", { silent = true, desc = "Open LazyGit" })
 vim.keymap.set("n", "<leader>ll", "<CMD>Lazy<CR>", { silent = true, desc = "Open LazyVim" })
-vim.keymap.set("n", "<leader>ls", "<CMD>DBUIToggle<CR>", { silent = true, desc = "Open DadbodUI" })
+vim.keymap.set("n", "<leader>ls", "<cmd>LazySql<CR>", { desc = "Toggle LazySql", noremap = true, silent = true })
 
 -- Debugger
 vim.keymap.set('n', '<leader>dc', function() require('dap').continue() end, { silent = true, desc = "Debug" })

@@ -4,7 +4,7 @@
 [init]
 	defaultBranch = main
 [core]
-	excludesfile = /Users/doba/.gitignore_global
+	excludesFile = /Users/doba/.gitignore_global
 	autocrlf = input
     pager = delta
 [difftool "sourcetree"]

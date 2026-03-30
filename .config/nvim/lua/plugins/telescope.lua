@@ -22,6 +22,7 @@ return {
 					"node_modules",
 					".git",
 					"dist",
+					".next",
 				},
 			},
 		})

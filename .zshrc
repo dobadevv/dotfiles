@@ -30,9 +30,6 @@ ZSH_THEME="robbyrussell"
 plugins=(git zsh-syntax-highlighting zsh-autosuggestions)
 source $ZSH/oh-my-zsh.sh
 
-eval "$(pyenv init --path)"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
 eval "$(fzf --zsh)"
@@ -42,3 +39,6 @@ source ~/.zshrc.alias
 source ~/.fzfrc
 
 . "$HOME/.local/bin/env"
+
+# Added by Antigravity
+export PATH="/Users/doba/.antigravity/antigravity/bin:$PATH"

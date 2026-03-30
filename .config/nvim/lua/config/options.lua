@@ -92,3 +92,7 @@ vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decr
 vim.o.foldlevelstart = 99
 vim.o.foldenable = false
 
+-- Debugger
+vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint" })
+vim.fn.sign_define("DapStopped", { text = "→", texthl = "DapStopped" })
+

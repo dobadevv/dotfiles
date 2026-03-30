@@ -1,5 +1,19 @@
 return {
 	{
+		"jay-babu/mason-null-ls.nvim",
+		config = function()
+			require("mason-null-ls").setup({
+				ensure_installed = {
+					"stylua",
+					"prettierd",
+					"goimports",
+					"eslint_d",
+				},
+			})
+		end,
+	},
+
+	{
 		"nvimtools/none-ls.nvim",
 		dependencies = {
 			"nvimtools/none-ls-extras.nvim",
@@ -18,11 +32,9 @@ return {
 				end,
 
 				sources = {
-					-- Formatters (NO ESLint)
 					null_ls.builtins.formatting.stylua,
 					null_ls.builtins.formatting.goimports,
-					null_ls.builtins.formatting.rustfmt,
-					null_ls.builtins.formatting.ruff,
+					null_ls.builtins.formatting.prettierd,
 
 					-- Linters
 					require("none-ls.diagnostics.eslint_d").with({
@@ -32,8 +44,6 @@ return {
 							"eslint.config.mjs",
 						},
 					}),
-
-					null_ls.builtins.diagnostics.ruff,
 				},
 			})
 		end,

@@ -23,6 +23,7 @@ customCommands:
     description: 'Pull for all local branches'
     command: 'git pa'
     context: 'localBranches'
+
 gui:
   theme:
     activeBorderColor:

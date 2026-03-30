@@ -1,101 +1,69 @@
 return {
-	"mfussenegger/nvim-dap",
-	dependencies = {
-		"rcarriga/nvim-dap-ui",
-		"igorlfs/nvim-dap-view",
-		"theHamsta/nvim-dap-virtual-text",
-        "nvim-neotest/nvim-nio",
-		"leoluz/nvim-dap-go",
-        "mxsdev/nvim-dap-vscode-js"
+	{
+		"jay-babu/mason-nvim-dap.nvim",
+		config = function()
+			require("mason-nvim-dap").setup({
+				ensure_installed = {
+					"delve",
+					"js-debug-adapter",
+				},
+				automatic_installation = true,
+			})
+		end,
 	},
-	config = function()
-		local dap = require("dap")
-		local dapui = require("dapui")
-		local dapgo = require("dap-go")
+	{
+		"mfussenegger/nvim-dap",
+		event = "VeryLazy",
+		dependencies = {
+			"rcarriga/nvim-dap-ui",
+			"nvim-neotest/nvim-nio",
+			"theHamsta/nvim-dap-virtual-text",
+      "leoluz/nvim-dap-go",
+		},
+		config = function()
+			local dap = require("dap")
+			local dapui = require("dapui")
+			local dap_virtual_text = require("nvim-dap-virtual-text")
+      local dap_go = require("dap-go")
+      local js_debug_path = "/Users/doba/.local/share/nvim/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js"
 
-		dap.listeners.before.attach.dapui_config = function()
-			dapui.open()
-		end
-		dap.listeners.before.launch.dapui_config = function()
-			dapui.open()
-		end
-		dap.listeners.before.event_terminated.dapui_config = function()
-			dapui.close()
-		end
-		dap.listeners.before.event_exited.dapui_config = function()
-			dapui.close()
-		end
-
-        dapgo.setup({
-            dap_configurations = {}
-        })
-
-			--      dap.configurations.go = {
-			--          {
-			-- 	type = "go",
-			-- 	name = "Debug",
-			-- 	request = "launch",
-			-- 	program = "${file}",
-			-- },
-			-- {
-			-- 	type = "go",
-			-- 	name = "Debug Package",
-			-- 	request = "launch",
-			-- 	program = "${fileDirname}",
-			-- },
-			-- {
-			-- 	type = "go",
-			-- 	name = "Attach to Remote",
-			-- 	mode = "remote",
-			-- 	request = "attach",
-			-- 	host = "127.0.0.1",
-			-- 	port = function()
-			-- 		return tonumber(vim.fn.input("Port: ", "38697"))
-			-- 	end,
-			-- },
-			--      }
-
-        -- Setup js-debug adapter
-        dap.adapters['pwa-node'] = {
-            type = 'server',
-            host = 'localhost',
-            port = '${port}',
-            executable = {
-                command = 'node',
-                args = { '/etc/js-debug/src/dapDebugServer.js', '${port}' },
-            },
+      -- JavaScript/Node.js adapter
+      dap.adapters['pwa-node'] = {
+        type = "server",
+        host = "localhost",
+        port = "${port}",
+        executable = {
+          command = "node",
+          args = { js_debug_path, "${port}" },
         }
+      }
 
-        -- TypeScript/JavaScript configurations
-        -- for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
-        --     dap.configurations[language] = {
-        --         {
-        --             type = "pwa-node",
-        --             request = "launch",
-        --             name = "Launch file",
-        --             program = "${file}",
-        --             cwd = "${workspaceFolder}",
-        --         },
-        --         {
-        --             type = "pwa-node",
-        --             request = "attach",
-        --             name = "Attach to Remote",
-        --             address = "localhost",
-        --             port = function()
-        --                 return tonumber(vim.fn.input("Port: ", "9229"))
-        --             end,
-        --             cwd = "${workspaceFolder}",
-        --             localRoot = "${workspaceFolder}",
-        --             remoteRoot = "${workspaceFolder}",
-        --             sourceMaps = true,
-        --             skipFiles = { "<node_internals>/**" },
-        --         }
-        --     }
-        -- end
+      -- Golang adapter (Delve)
+      dap.adapters.delve = {
+				type = "server",
+				port = "${port}",
+				executable = {
+					command = "dlv",
+					args = { "dap", "-l", "127.0.0.1:${port}" },
+				},
+			}
 
-        vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint" })
-        vim.fn.sign_define("DapStopped", { text = "→", texthl = "DapStopped" })
+			dap.listeners.before.attach.dapui_config = function()
+				dapui.open()
+			end
+			dap.listeners.before.launch.dapui_config = function()
+				dapui.open()
+			end
+			dap.listeners.before.event_terminated.dapui_config = function()
+				dapui.close()
+			end
+			dap.listeners.before.event_exited.dapui_config = function()
+				dapui.close()
+			end
 
-        dapui.setup()
-    end,
+			dap_virtual_text.setup({})
+      dap_go.setup()
+			dapui.setup()
+		end,
+	},
 }
