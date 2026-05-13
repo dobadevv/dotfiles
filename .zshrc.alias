@@ -161,3 +161,9 @@ function dbml() {
 
   echo "✅ Created: ${outdir}/${output}.dbml"
 }
+
+# Claude 
+function reset_claude() {
+  rm ~/.claude.json
+  rm -rf ~/.claude
+}

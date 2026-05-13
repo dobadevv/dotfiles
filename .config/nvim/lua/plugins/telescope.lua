@@ -23,6 +23,7 @@ return {
 					".git",
 					"dist",
 					".next",
+					"coverage",
 				},
 			},
 		})
