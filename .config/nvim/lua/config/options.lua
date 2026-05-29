@@ -16,10 +16,10 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.expandtab = true
 
 -- Number of spaces for each indentation level
-vim.opt.shiftwidth = 2
+vim.opt.shiftwidth = 4
 
 -- Number of spaces a tab counts for
-vim.opt.tabstop = 2
+vim.opt.tabstop = 4
 
 -- Number of spaces for tab in insert mode
 vim.opt.softtabstop = 2
@@ -87,10 +87,11 @@ vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#1e1e2e" })
 vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#89b4fa", bg = "#1e1e2e" })
 
 -- Fold 
-vim.o.foldcolumn = '1' -- '0' is not bad
-vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
-vim.o.foldlevelstart = 99
-vim.o.foldenable = false
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
 
 -- Debugger
 vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint" })

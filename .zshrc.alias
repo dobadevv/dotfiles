@@ -167,3 +167,9 @@ function reset_claude() {
   rm ~/.claude.json
   rm -rf ~/.claude
 }
+
+# Homebrew
+function bup() {
+  echo "🍺 Updating Homebrew..."
+  brew update && brew upgrade && brew cleanup
+}

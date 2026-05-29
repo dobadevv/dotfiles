@@ -11,15 +11,12 @@ done
 
 # Add deno completions to search path
 if [[ ":$FPATH:" != *":/Users/doba/.zsh/completions:"* ]]; then export FPATH="/Users/doba/.zsh/completions:$FPATH"; fi
-source ~/.nvm/nvm.sh
 
 # bun completions
-[ -s "/Users/doba/.bun/_bun" ] && source "/Users/doba/.bun/_bun"
+# [ -s "/Users/doba/.bun/_bun" ] && source "/Users/doba/.bun/_bun"
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-. "/Users/doba/.deno/env"
+# . "/Users/doba/.deno/env"
 
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/doba/.docker/completions $fpath)
@@ -38,7 +35,6 @@ source <(ng completion script)
 source ~/.zshrc.alias
 source ~/.fzfrc
 
-. "$HOME/.local/bin/env"
-
-# Added by Antigravity
-export PATH="/Users/doba/.antigravity/antigravity/bin:$PATH"
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/Users/doba/.sdkman"
+[[ -s "/Users/doba/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/doba/.sdkman/bin/sdkman-init.sh"

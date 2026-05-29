@@ -19,10 +19,6 @@ customCommands:
     command: 'git branches-desc'
     context: 'localBranches'
     output: popup
-  - key: '<C-p>'
-    description: 'Pull for all local branches'
-    command: 'git pa'
-    context: 'localBranches'
 
 gui:
   theme:
