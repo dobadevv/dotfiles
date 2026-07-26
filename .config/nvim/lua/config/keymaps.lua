@@ -101,7 +101,21 @@ local function hover()
         })
     end
 end
-vim.keymap.set("n", "<leader>gd", require('telescope.builtin').lsp_definitions, { silent = true, desc = "Go to definition" })
+local function go_to_definition()
+    local params = vim.lsp.util.make_position_params(0, "utf-8")
+    vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result)
+        if err or not result or vim.tbl_isempty(result) then
+            vim.lsp.buf.definition()
+            return
+        end
+        if #result > 1 then
+            require("telescope.builtin").lsp_definitions()
+        else
+            vim.lsp.util.jump_to_location(result[1], "utf-8")
+        end
+    end)
+end
+vim.keymap.set("n", "<leader>gd", go_to_definition, { silent = true, desc = "Go to definition" })
 vim.keymap.set("n", "<leader>gr", require('telescope.builtin').lsp_references, { silent = true, desc = "Go to references" })
 vim.keymap.set("n", "<leader>gi", require("telescope.builtin").lsp_implementations, { silent = true, desc = "Go to implementation" })
 vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { silent = true, desc = "Code action" })

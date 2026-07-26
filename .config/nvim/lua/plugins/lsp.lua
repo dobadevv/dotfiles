@@ -8,6 +8,7 @@ return {
 					"gopls",
 					"ts_ls",
 					"eslint",
+					"rust_analyzer",
 				},
 			})
 		end,
@@ -67,8 +68,20 @@ return {
 				},
 			})
 
+			-- Rust LSP
+			vim.lsp.config("rust_analyzer", {
+				capabilities = capabilities,
+				settings = {
+					["rust-analyzer"] = {
+						cargo = { allFeatures = true },
+						checkOnSave = true,
+						check = { command = "clippy" },
+					},
+				},
+			})
+
 			-- Enable LSP servers
-			vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "eslint" })
+			vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "eslint", "rust_analyzer" })
 		end,
 	},
 }
