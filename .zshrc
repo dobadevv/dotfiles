@@ -38,3 +38,11 @@ source ~/.fzfrc
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/Users/doba/.sdkman"
 [[ -s "/Users/doba/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/doba/.sdkman/bin/sdkman-init.sh"
+
+# pnpm
+export PNPM_HOME="/Users/doba/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end

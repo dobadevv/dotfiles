@@ -13,6 +13,7 @@ alias work='tmuxall && tmux attach -t dotfiles'
 # Neovim
 alias n="nvim"
 alias nvim_clear_cache="rm ~/.local/share/nvim/sessions/*"
+alias nvim_reset="rm -rf ~/.local/share/nvim && rm -rf ~/.local/state/nvim && rm -rf ~/.cache/nvim"
 
 # Load environment from a dotfile
 function load() {
@@ -115,9 +116,6 @@ function tmuxall() {
     for file in ~/.config/tmuxinator/*.yaml; do tmuxinator start "$(basename "$file" .yaml)" --no-attach; done
 }
 
-# nvim
-alias reset_nvim_session='rm -rf /Users/doba/.local/share/nvim/sessions/*'
-
 # DBML
 function dbml() {
   local tables=()
@@ -167,6 +165,13 @@ function reset_claude() {
   rm ~/.claude.json
   rm -rf ~/.claude
 }
+alias clauded="claude --dangerously-skip-permissions"
+
+# Codex 
+alias codexed="codex --dangerously-bypass-approvals-and-sandbox"
+
+# Ollama
+alias qwen="ollama launch claude --model qwen3.6:27b"
 
 # Homebrew
 function bup() {
