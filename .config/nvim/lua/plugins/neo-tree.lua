@@ -13,6 +13,18 @@ return {
 			require("neo-tree").setup({
 				window = {
 					position = "right",
+					mappings = {
+						-- Map "Y" to copy the filename to the system clipboard register (+)
+						["Y"] = function(state)
+							local node = state.tree:get_node()
+							local absolute_path = node:get_id()
+							-- Convert the absolute path into a path relative to the current working directory
+							local relative_path = vim.fn.fnamemodify(absolute_path, ":.")
+
+							vim.fn.setreg("+", relative_path)
+							vim.notify("Copied relative path: " .. relative_path)
+						end,
+					},
 				},
 				event_handlers = {
 					{

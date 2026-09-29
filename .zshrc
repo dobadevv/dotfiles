@@ -1,3 +1,7 @@
+
+# Kiro CLI pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
+
 source ~/.zshrc.env
 source ~/.zshrc.secret
 
@@ -13,10 +17,10 @@ done
 if [[ ":$FPATH:" != *":/Users/doba/.zsh/completions:"* ]]; then export FPATH="/Users/doba/.zsh/completions:$FPATH"; fi
 
 # bun completions
-# [ -s "/Users/doba/.bun/_bun" ] && source "/Users/doba/.bun/_bun"
+[ -s "/Users/doba/.bun/_bun" ] && source "/Users/doba/.bun/_bun"
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-# . "/Users/doba/.deno/env"
+. "/Users/doba/.deno/env"
 
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/doba/.docker/completions $fpath)
@@ -46,3 +50,7 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
+
+
+# Kiro CLI post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"

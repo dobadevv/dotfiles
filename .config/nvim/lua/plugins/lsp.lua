@@ -9,6 +9,8 @@ return {
 					"ts_ls",
 					"eslint",
 					"rust_analyzer",
+					"basedpyright",
+					"ruff",
 				},
 			})
 		end,
@@ -80,8 +82,21 @@ return {
 				},
 			})
 
+			-- Python type checking LSP
+			vim.lsp.config("basedpyright", {
+				capabilities = capabilities,
+			})
+
+			-- Python linting LSP (diagnostics only; basedpyright covers hover/completion)
+			vim.lsp.config("ruff", {
+				capabilities = capabilities,
+				on_attach = function(client)
+					client.server_capabilities.hoverProvider = false
+				end,
+			})
+
 			-- Enable LSP servers
-			vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "eslint", "rust_analyzer" })
+			vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "eslint", "rust_analyzer", "basedpyright", "ruff" })
 		end,
 	},
 }

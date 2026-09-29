@@ -1,30 +1,33 @@
 tap "athevon/tokeneater", "https://github.com/AThevon/homebrew-tokeneater", trusted: { casks: ["tokeneater"] }
 tap "charmbracelet/tap", trusted: true
+tap "floci-io/floci"
 tap "jesseduffield/lazydocker", trusted: true
 tap "ktr0731/evans", trusted: true
 tap "ngrok/ngrok", trusted: true
 tap "osx-cross/arm", trusted: true
 tap "osx-cross/avr", trusted: true
+# Command-line interface for SQLite
+brew "sqlite"
+# Official Amazon AWS command-line interface
+brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
+# Incredibly fast JavaScript runtime, bundler, test runner, and package manager
+brew "bun"
 # Wrap Gemini CLI, Codex, Claude Code, Qwen Code as an API service
 brew "cliproxyapi", restart_service: :changed
 # Dependency manager for Cocoa projects
 brew "cocoapods"
-# Convert text between DOS, UNIX, and Mac formats
-brew "dos2unix"
-# More expressive universal gRPC client
-brew "evans"
+# Secure runtime for JavaScript and TypeScript
+brew "deno"
 # Modern, maintained replacement for ls
 brew "eza"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
-# Banner-like program prints strings as ASCII art
-brew "figlet"
 # Command-line fuzzy finder written in Go
 brew "fzf"
 # GitHub command-line tool
@@ -51,12 +54,6 @@ brew "graphviz"
 brew "grpcurl"
 # Improved top (interactive process viewer)
 brew "htop"
-# Tools and libraries to manipulate images in select formats
-brew "imagemagick"
-# Command-line interface for SQLite
-brew "sqlite"
-# Convert images to PDF via direct JPEG inclusion
-brew "img2pdf"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
 # Lazier way to manage everything docker
@@ -69,18 +66,16 @@ brew "lazysql"
 brew "libpq"
 # Manage multiple Node.js versions
 brew "nvm"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
+# AI coding agent, built for the terminal
+brew "opencode"
 # Draw UML diagrams
 brew "plantuml"
-# PDF rendering library (based on the xpdf-3.0 code base)
-brew "poppler"
 # Protocol buffers (Google's data interchange format)
 brew "protobuf"
 # Monitor data's progress through a pipe
 brew "pv"
-# SVG rendering tool and library
-brew "resvg"
-# Search tool like grep and The Silver Searcher
-brew "ripgrep"
 # CLI proxy to minimize LLM token consumption
 brew "rtk"
 # Generate type safe Go from SQL
@@ -89,8 +84,6 @@ brew "sqlc"
 brew "starship"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
 brew "stow"
-# Official tldr client written in Rust
-brew "tlrc"
 # Terminal multiplexer
 brew "tmux"
 # Manage complex tmux sessions easily
@@ -109,6 +102,8 @@ brew "yazi"
 brew "yq"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
+# Official CLI for the Floci local AWS emulator
+brew "floci-io/floci/floci", trusted: true
 # Tools for building Android applications
 cask "android-studio"
 # Memory training application
@@ -123,10 +118,10 @@ cask "chatgpt"
 cask "claude"
 # Terminal-based AI coding assistant
 cask "claude-code"
+# Free app that makes your Internet safer
+cask "cloudflare-warp"
 # OpenAI's coding agent that runs in your terminal
 cask "codex"
-# Universal database tool and SQL client
-cask "dbeaver-community"
 # Voice and text chat software
 cask "discord"
 # App to build and share containerised applications and microservices
@@ -134,26 +129,28 @@ cask "docker-desktop"
 # Collaborative team software
 cask "figma"
 cask "font-jetbrains-mono-nerd-font"
-# Native desktop AI assistant from Google
-cask "google-gemini"
 # Blocks all Keyboard and TouchBar input
 cask "keyboardcleantool"
+# Agent-centric IDE with spec-driven development
+cask "kiro"
+# AI-powered productivity tool for the command-line
+cask "kiro-cli"
 # Office suite
 cask "microsoft-office"
 # Meet, chat, call, and collaborate in just one place
 cask "microsoft-teams"
 # Interactive tool for analyzing MongoDB data
 cask "mongodb-compass"
-# Reverse proxy, secure introspectable tunnels to localhost
-cask "ngrok/ngrok/ngrok"
-# App to write, plan, collaborate, and get organised
-cask "notion"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
+# Client program for the OpenVPN Access Server
+cask "openvpn-connect"
 # Control your tools with a few keystrokes
 cask "raycast"
 # Move and resize windows using keyboard shortcuts or snap areas
 cask "rectangle"
+# Native database client for many database types
+cask "tablepro"
 # Desktop client for Telegram messenger
 cask "telegram-desktop"
 # SSH client
@@ -162,8 +159,6 @@ cask "termius"
 cask "visual-studio-code"
 # GPU-accelerated cross-platform terminal emulator and multiplexer
 cask "wezterm"
-# Native desktop client for WhatsApp
-cask "whatsapp"
 # REST, GraphQL and gRPC client
 cask "yaak"
 # Messaging and calling application
@@ -175,27 +170,27 @@ vscode "anthropic.claude-code"
 vscode "catppuccin.catppuccin-vsc"
 vscode "dbaeumer.vscode-eslint"
 vscode "esbenp.prettier-vscode"
-vscode "expo.vscode-expo-tools"
 vscode "golang.go"
 vscode "jebbs.plantuml"
 vscode "ms-vscode.vscode-typescript-next"
 vscode "pkief.material-icon-theme"
-vscode "redhat.java"
 vscode "redhat.vscode-yaml"
-vscode "vscjava.vscode-gradle"
-vscode "vscjava.vscode-java-debug"
-vscode "vscjava.vscode-java-dependency"
-vscode "vscjava.vscode-java-pack"
-vscode "vscjava.vscode-java-test"
-vscode "vscjava.vscode-maven"
 go "github.com/air-verse/air"
+go "github.com/bufbuild/buf/cmd/buf"
+go "github.com/go-delve/delve/cmd/dlv"
 go "github.com/vladopajic/go-test-coverage/v2"
+go "golang.org/x/tools/cmd/godoc"
 go "golang.org/x/tools/gopls"
 go "github.com/dobadevv/goq/cmd/goq-cli"
+go "github.com/vektra/mockery/v2"
 go "github.com/golang/mock/mockgen"
+go "google.golang.org/protobuf/cmd/protoc-gen-go"
+go "google.golang.org/grpc/cmd/protoc-gen-go-grpc"
 go "github.com/swaggo/swag/cmd/swag"
 cargo "bob-nvim"
+cargo "cargo-dist"
 cargo "cargo-generate"
+cargo "rmqtui"
 cargo "sleek"
 uv "graphifyy"
 uv "serena-agent"
