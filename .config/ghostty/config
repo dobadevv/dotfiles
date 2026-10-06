@@ -1,0 +1,18 @@
+# Font
+font-family = JetBrainsMono Nerd Font
+font-size = 16
+
+# Theme
+theme = Catppuccin Mocha
+
+# Ẩn titlebar nhưng vẫn resize được (tương đương window_decorations = "RESIZE")
+macos-titlebar-style = hidden
+
+# Tuỳ chọn: tự copy khi bôi đen
+copy-on-select = clipboard
+
+# Tuỳ chọn (tương đương 2 dòng đang comment trong wezterm)
+# background-opacity = 0.5
+# background-blur-radius = 50
+
+cursor-style-blink = false

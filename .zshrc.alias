@@ -1,0 +1,226 @@
+# Internal
+alias e='exit'
+alias c='clear'
+alias r='source ~/.zshrc'
+alias myip="ifconfig | grep -o '192\.168\.68\.[0-9]\+' | grep -v '192\.168\.68\.255'"
+alias ls="eza --icons=always -a"
+alias cd="z"
+alias cat="bat"
+alias lzs="lazysql"
+
+# Neovim
+alias n="nvim"
+alias nvim_clear_cache="rm ~/.local/share/nvim/sessions/*"
+alias nvim_reset="rm -rf ~/.local/share/nvim && rm -rf ~/.local/state/nvim && rm -rf ~/.cache/nvim"
+
+# Load environment from a dotfile
+function load() {
+    set -a
+    source $1
+    set +a
+}
+
+# JQ
+function j2q() {
+  echo "$1" | jq -r 'to_entries | map("\(.key)=\(.value|@uri)") | join("&")'
+}
+
+function q2j() {
+  echo "$1" | awk -F '[=&]' '{
+       printf "{";
+       for (i=1; i<=NF; i+=2) {
+         if (i>1) printf ",";
+         printf "\"%s\":\"%s\"", $i, $(i+1);
+       }
+       printf "}\n";
+     }' | sed 's/+/ /g' | jq .
+}
+
+# Yazi
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
+
+# Nodejs
+alias pn='pnpm'
+alias psd='pnpm start:dev'
+
+function now() {
+    local day="" month="" year="" hour="" minute=""
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -d) day="$2"; shift 2 ;;
+            -m) month="$2"; shift 2 ;;
+            -y) year="$2"; shift 2 ;;
+            -h) hour="$2"; shift 2 ;;
+            -mi) minute="$2"; shift 2 ;;
+            *)
+                echo "Usage: now [-d day] [-m month] [-y year] [-h hour] [-mi minute]" >&2
+                return 1
+                ;;
+        esac
+    done
+
+    if [[ -z "$day" && -z "$month" && -z "$year" && -z "$hour" && -z "$minute" ]]; then
+        node -e "console.log(new Date().toISOString())"
+        return
+    fi
+
+    NOW_DAY="$day" NOW_MONTH="$month" NOW_YEAR="$year" NOW_HOUR="$hour" NOW_MINUTE="$minute" node -e '
+    const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
+    const nowVN = new Date(Date.now() + VN_OFFSET_MS);
+    const year = process.env.NOW_YEAR ? parseInt(process.env.NOW_YEAR, 10) : nowVN.getUTCFullYear();
+    const month = process.env.NOW_MONTH ? parseInt(process.env.NOW_MONTH, 10) - 1 : nowVN.getUTCMonth();
+    const day = process.env.NOW_DAY ? parseInt(process.env.NOW_DAY, 10) : nowVN.getUTCDate();
+    const hour = process.env.NOW_HOUR ? parseInt(process.env.NOW_HOUR, 10) : 0;
+    const minute = process.env.NOW_MINUTE ? parseInt(process.env.NOW_MINUTE, 10) : 0;
+    const utcMs = Date.UTC(year, month, day, hour, minute) - VN_OFFSET_MS;
+    console.log(new Date(utcMs).toISOString());
+    '
+}
+
+# Docker
+alias dp='docker ps'
+alias di='docker images'
+alias dr='docker rm'
+alias dri='docker rmi'
+alias lzd='lazydocker'
+alias dcu='docker compose up -d --build && drni'
+alias dcd='docker compose down'
+
+function drni() {
+    docker images --filter "dangling=true" -q --no-trunc | xargs -r docker rmi
+}
+
+# Git
+alias lg='lazygit'
+alias g='git'
+alias gp='git push'
+alias gpt='git push --tag'
+alias gpl='git pull'
+alias gc='git checkout'
+alias gb='git branch'
+alias gs='git status'
+alias cz='cz --name cz_ai commit'
+
+# Bump the patch version and create a new git tag
+# Usage: bump-patch [suffix]
+#   bump_patch          -> v1.0.15 -> v1.0.16
+#   bump_patch rc        -> v1.0.15 -> v1.0.16-rc
+function bump_patch() {
+  local suffix="$1"
+  local latest_tag
+  latest_tag=$(git tag -l "v*.*.*-rc" --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+
+  if [[ -z "$latest_tag" ]]; then
+    echo "No existing tags found matching vX.Y.Z" >&2
+    return 1
+  fi
+
+  # Strip any suffix (e.g. -rc, -rc1) to get the bare version
+  local base_version="${latest_tag%%-*}"
+  local major minor patch
+  major=$(echo "$base_version" | cut -d. -f1 | tr -d 'v')
+  minor=$(echo "$base_version" | cut -d. -f2)
+  patch=$(echo "$base_version" | cut -d. -f3)
+
+  local new_patch=$((patch + 1))
+  local new_tag="v${major}.${minor}.${new_patch}-rc"
+
+  if [[ -n "$suffix" ]]; then
+    new_tag="${new_tag}-${suffix}"
+  fi
+
+  echo "Latest tag: $latest_tag"
+  echo "New tag:    $new_tag"
+
+  read -q "REPLY?Create and push this tag? (y/n) "
+  echo
+  if [[ "$REPLY" == "y" ]]; then
+    git tag "$new_tag"
+    git push origin "$new_tag"
+    echo "Tagged and pushed: $new_tag"
+  else
+    echo "Aborted."
+  fi
+}
+
+# Kubernetes
+alias kube='kubectl'
+
+# Tmux
+alias work='tmuxall && tmux attach -t dotfiles'
+
+function tmuxall() {
+    for file in ~/.config/tmuxinator/*.yaml; do tmuxinator start "$(basename "$file" .yaml)" --no-attach; done
+}
+
+# DBML
+function dbml() {
+  local tables=()
+  local outdir="."
+  local output="output"
+
+  # Parse flags
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      -o|--output) output=$2; shift 2 ;;
+      -d|--dir)    outdir=$2; shift 2 ;;
+      *) tables+=($1); shift ;;
+    esac
+  done
+
+  if [[ ${#tables[@]} -eq 0 ]]; then
+    echo "Usage: dbml <table1> [table2] ... [-o output_name] [-d output_dir]"
+    return 1
+  fi
+
+  if [[ -z "$DB_CONNECTION" ]]; then
+    echo "❌ \$DB_CONNECTION is not set"
+    return 1
+  fi
+
+  rm -f "${outdir}/${output}.dbml"
+
+  local tmp=$(mktemp /tmp/dbml_dump_XXXX.sql)
+
+  for table in "${tables[@]}"; do
+    echo "🔍 Fetching schema for: $table..."
+    pg_dump "$DB_CONNECTION" \
+      --schema-only \
+      --no-owner \
+      --no-privileges \
+      --table "$table" >> "$tmp"
+  done
+
+  sql2dbml --postgres "$tmp" -o "${outdir}/${output}.dbml"
+  rm "$tmp"
+
+  echo "✅ Created: ${outdir}/${output}.dbml"
+}
+
+# Claude 
+function reset_claude() {
+  rm ~/.claude.json
+  rm -rf ~/.claude
+}
+alias clauded="claude --dangerously-skip-permissions"
+
+# Codex 
+alias codexed="codex --dangerously-bypass-approvals-and-sandbox"
+
+# Ollama
+alias qwen="ollama launch claude --model qwen3.6:27b"
+
+# Homebrew
+alias brew_dump="rm -f ~/dotfiles/Brewfile && brew bundle dump --file=~/dotfiles/Brewfile"
+alias brew_restore="brew bundle --file=~/dotfiles/Brewfile"
+
+function bup() {
+  echo "🍺 Updating Homebrew..."
+  brew update && brew upgrade && brew cleanup
+}
