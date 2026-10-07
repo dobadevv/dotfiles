@@ -85,6 +85,9 @@ return {
 			-- Python type checking LSP
 			vim.lsp.config("basedpyright", {
 				capabilities = capabilities,
+				-- Prefer the uv workspace root over a member's own pyproject.toml,
+				-- so the shared .venv at the workspace root is used.
+				root_markers = { { "uv.lock", "pyrightconfig.json" }, "pyproject.toml", "setup.py", ".git" },
 			})
 
 			-- Python linting LSP (diagnostics only; basedpyright covers hover/completion)
