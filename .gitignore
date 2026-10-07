@@ -7,6 +7,7 @@
 .config/jgit
 .config/linearmouse
 .config/nvim/lazy-lock.json
+.config/opencode
 .config/raycast
 .config/tmux
 .config/tmuxinator
