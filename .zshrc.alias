@@ -213,6 +213,9 @@ alias clauded="claude --dangerously-skip-permissions"
 # Codex 
 alias codexed="codex --dangerously-bypass-approvals-and-sandbox"
 
+# Opencode
+alias opencoded="opencode --auto"
+
 # Ollama
 alias qwen="ollama launch claude --model qwen3.6:27b"
 
