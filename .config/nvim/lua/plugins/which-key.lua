@@ -12,7 +12,6 @@ return {
                 { "<leader>-", icon = devicons.get_icon("tmux.conf") },
                 { "<leader>|", icon = devicons.get_icon("tmux.conf") },
                 { "<leader>l", icon = "󰒲", desc = "Lazy tools" },
-                { "<leader>d",  group = "Debug" },
                 { "<leader>f", group = "file/find" },
                 { "<leader>g", group = "git" },
                 { "<leader>c", group = "code" },

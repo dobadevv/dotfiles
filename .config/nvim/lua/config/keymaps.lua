@@ -135,16 +135,6 @@ vim.keymap.set("n", "<leader>lg", "<CMD>LazyGit<CR>", { silent = true, desc = "O
 vim.keymap.set("n", "<leader>ll", "<CMD>Lazy<CR>", { silent = true, desc = "Open LazyVim" })
 vim.keymap.set("n", "<leader>ls", "<cmd>LazySql<CR>", { desc = "Toggle LazySql", noremap = true, silent = true })
 
--- Debugger
-vim.keymap.set('n', '<leader>dc', function() require('dap').continue() end, { silent = true, desc = "Debug" })
-vim.keymap.set('n', '<leader>dn', function() require('dap').step_over() end, { silent = true, desc = "Step over" })
-vim.keymap.set('n', '<leader>di', function() require('dap').step_into() end, { silent = true, desc = "Step into" })
-vim.keymap.set('n', '<leader>do', function() require('dap').step_out() end, { silent = true, desc = "Step out" })
-vim.keymap.set('n', '<leader>db', function() require('dap').toggle_breakpoint() end, { silent = true, desc = "Toggle breakpoint" })
-vim.keymap.set({'n', 'v'}, '<leader>dh', function() require('dap.ui.widgets').hover() end, { silent = true, desc = "Debug hover" })
-vim.keymap.set({'n', 'v'}, '<leader>dp', function() require('dap.ui.widgets').preview() end, { silent = true, desc = "Debug preview" })
-vim.keymap.set('n', '<leader>du', function() require("dapui").toggle() end, { silent = true, desc = "Open debug UI" })
-
 -- Git
 vim.keymap.set('n', '<leader>gv', "<CMD>DiffviewOpen<CR>", { silent = true, desc = "Open diff view" })
 vim.keymap.set('n', '<leader>gc', "<CMD>DiffviewClose<CR>", { silent = true, desc = "Close diff view" })
