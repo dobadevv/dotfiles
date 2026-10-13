@@ -1,0 +1,1 @@
+../shared/rules/go.md

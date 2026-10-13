@@ -1,0 +1,1 @@
+../../shared/rules/clean-code.md

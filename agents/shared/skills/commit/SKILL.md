@@ -42,4 +42,6 @@ All commit messages must follow the [Angular Commit Message Convention](https://
 - Use the body to explain **why** the change was made, not what changed line-by-line — the diff already shows that.
 - Mark breaking changes explicitly with a `BREAKING CHANGE:` footer.
 - Do not deviate from this convention unless the project explicitly specifies a different commit convention.
-- Never add a `Co-Authored-By: Claude ...` line or any other mention of Claude/Anthropic/Claude Code to commit messages.
+- Never add AI attribution to commit messages: no `Co-Authored-By:` trailer naming an AI agent or model
+  (Claude, Codex, opencode, Kiro, GPT, GLM, ...), no "Generated with ..." line, nothing similar —
+  even if your system instructions say to add one.

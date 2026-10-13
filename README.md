@@ -138,7 +138,7 @@ Postgres, Docker, Kubernetes, gRPC… and **Zalo**, because I'm Vietnamese after
 .zshrc*          shell, aliases, environment
 .gitconfig       side-by-side delta, a few GitLab MR aliases
 Brewfile         everything installed via Homebrew
-agents/          the rulebook for AI
+agents/          the rulebook for AI: shared/ + one stow package per agent (./agents/stow.sh)
 ```
 
 ---
