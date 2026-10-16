@@ -227,3 +227,52 @@ function bup() {
   echo "🍺 Updating Homebrew..."
   brew update && brew upgrade && brew cleanup
 }
+
+# Argon2
+function argon2hash() {
+  if ! command -v argon2 >/dev/null; then
+    print -u2 "argon2 not found (brew install argon2 / sudo apt install argon2)"
+    return 1
+  fi
+
+  local pw="$1"
+  if [[ -z $pw ]]; then
+    read -rs "pw?Password: "
+    print -u2
+  fi
+  [[ -z $pw ]] && { print -u2 "Empty password"; return 1 }
+
+  local salt=$(openssl rand -base64 16)
+
+  print -rn -- "$pw" | argon2 "$salt" -id \
+    -t ${ARGON2_T:-3} \
+    -k ${ARGON2_M:-65536} \
+    -p ${ARGON2_P:-4} \
+    -l ${ARGON2_L:-32} \
+    -e
+}
+
+function argon2verify() {
+  local hash="$1" pw="$2"
+  if [[ -z $hash ]]; then
+    print -u2 "Usage: argon2verify '<hash>' [password]"
+    return 2
+  fi
+  if [[ -z $pw ]]; then
+    read -rs "pw?Password: "
+    print -u2
+  fi
+
+  ARGON2_HASH="$hash" ARGON2_PW="$pw" NODE_PATH="$(npm root -g)" node - <<'EOF'
+let argon2;
+try {
+  argon2 = require('argon2');
+} catch {
+  console.error('argon2 not installed: npm i -g argon2');
+  process.exit(2);
+}
+argon2.verify(process.env.ARGON2_HASH, process.env.ARGON2_PW)
+  .then(ok => { console.log(ok ? 'true' : 'false'); process.exit(ok ? 0 : 1); })
+  .catch(err => { console.error(`Invalid hash: ${err.message}`); process.exit(2); });
+EOF
+}

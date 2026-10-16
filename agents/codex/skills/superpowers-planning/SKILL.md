@@ -147,7 +147,8 @@ touched. If source files changed, report it to the user — do not revert silent
 
 Then tell the user: spec path, plan path, task count, recommended execution mode + reason,
 and any open assumptions. Mention how to proceed when they are ready:
-`superpowers:subagent-driven-development` (subagent) or `superpowers:executing-plans` (native).
+`superpowers-implementation` (pass it the plan path and the recommended mode) — it runs the
+worktree, implement, review/fix, and PR phases on fixed models.
 
 **Stop here.** Do not offer to start implementing, and do not start it.
 
