@@ -16,3 +16,5 @@ copy-on-select = clipboard
 # background-blur-radius = 50
 
 cursor-style-blink = false
+
+macos-option-as-alt = true
