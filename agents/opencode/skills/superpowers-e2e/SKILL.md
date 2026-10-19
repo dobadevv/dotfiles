@@ -35,7 +35,8 @@ user (Phase 1, step 5).
 | Role | Dispatch | Model | Used for |
 |------|----------|-------|----------|
 | thinker | `task` tool, `subagent_type: "superpowers-thinker"` | `opencode-go/glm-5.3` | spec, plan, review |
-| coder | `task` tool, `subagent_type: "superpowers-coder"` | `opencode-go/deepseek-v4-flash` | implement, fix |
+| implementer | `task` tool, `subagent_type: "superpowers-implementer"` | `opencode-go/deepseek-v4.1-flash` | implement plan tasks |
+| coder | `task` tool, `subagent_type: "superpowers-coder"` | `opencode-go/deepseek-v4-pro` | blocked-task escalation, fix, history cleanup |
 
 The model is pinned in the subagent definition (`~/.config/opencode/agents/superpowers-*.md`),
 so a dispatch only names the subagent. Never run a pipeline phase on the built-in `general`
@@ -49,8 +50,9 @@ or `explore` subagent — they use the session model.
 | 1.5 | Create worktree | main agent | session | `superpowers:using-git-worktrees` | worktree path |
 | 2 | Write + self-review spec | 1 subagent | `thinker` | brainstorming's spec format + `spec-document-reviewer-prompt.md` | spec path |
 | 3 | Write + self-review plan | 1 subagent | `thinker` | `superpowers:writing-plans` | plan path + `native`/`subagent` recommendation |
-| 4a | Implement (native) | exactly 1 subagent | `coder` | `superpowers:executing-plans` + `superpowers:test-driven-development` | done report |
-| 4b | Implement (subagent) | 1 subagent per task | `coder` | `superpowers:subagent-driven-development` (no per-task review) + TDD | done report per task |
+| 4a | Implement (native) | exactly 1 subagent | `implementer` | `superpowers:executing-plans` + `superpowers:test-driven-development` | done report |
+| 4b | Implement (subagent) | 1 subagent per task | `implementer` | `superpowers:subagent-driven-development` (no per-task review) + TDD | done report per task |
+| 4c | Escalate a `BLOCKED` task | 1 fresh subagent per blocked task | `coder` | `superpowers:systematic-debugging` + TDD | done report or `UNWORKABLE` |
 | 5 | Review | 1 fresh subagent per round | `thinker` | `superpowers:requesting-code-review` | findings or `CLEAN` |
 | 6 | Fix | 1 fresh subagent per round | `coder` | `superpowers:receiving-code-review` + TDD | fix report |
 | 7 | Publish | main agent | session | `superpowers:finishing-a-development-branch` (option: push + PR) | PR URL |
@@ -63,8 +65,9 @@ digraph e2e {
     "Spec writer (thinker)" [shape=box];
     "Planner (thinker)" [shape=box];
     "Recommendation?" [shape=diamond];
-    "ONE implementer for all tasks (coder)" [shape=box];
-    "One implementer per task (coder)" [shape=box];
+    "ONE implementer for all tasks (implementer)" [shape=box];
+    "One implementer per task (implementer)" [shape=box];
+    "Escalate blocked task (coder)" [shape=box];
     "Reviewer (thinker)" [shape=box];
     "CLEAN?" [shape=diamond];
     "Fixer (coder)" [shape=box];
@@ -78,10 +81,14 @@ digraph e2e {
     "Create worktree (main)" -> "Spec writer (thinker)";
     "Spec writer (thinker)" -> "Planner (thinker)";
     "Planner (thinker)" -> "Recommendation?";
-    "Recommendation?" -> "ONE implementer for all tasks (coder)" [label="native"];
-    "Recommendation?" -> "One implementer per task (coder)" [label="subagent"];
-    "ONE implementer for all tasks (coder)" -> "Reviewer (thinker)";
-    "One implementer per task (coder)" -> "Reviewer (thinker)";
+    "Recommendation?" -> "ONE implementer for all tasks (implementer)" [label="native"];
+    "Recommendation?" -> "One implementer per task (implementer)" [label="subagent"];
+    "ONE implementer for all tasks (implementer)" -> "Reviewer (thinker)";
+    "One implementer per task (implementer)" -> "Reviewer (thinker)";
+    "ONE implementer for all tasks (implementer)" -> "Escalate blocked task (coder)" [label="BLOCKED"];
+    "One implementer per task (implementer)" -> "Escalate blocked task (coder)" [label="BLOCKED"];
+    "Escalate blocked task (coder)" -> "ONE implementer for all tasks (implementer)" [label="native: continue N+1"];
+    "Escalate blocked task (coder)" -> "One implementer per task (implementer)" [label="subagent: next task"];
     "Reviewer (thinker)" -> "CLEAN?";
     "CLEAN?" -> "Push + create PR (main)" [label="yes"];
     "Push + create PR (main)" -> "Report to user";
@@ -176,30 +183,65 @@ Reply with exactly:
 
 Use the planner's `EXECUTION` value. Do not ask the user to choose.
 
-## Phase 4 — Implement (coder only)
+## Phase 4 — Implement (implementer, coder on escalation)
 
 Before dispatching, record `BASE_SHA=$(git -C <WORKTREE_PATH> rev-parse HEAD)` — the reviewer diffs against it.
 
 The main agent writes **no** production or test code. Ever.
 
-**4a — native:** dispatch **exactly one** coder (`task(subagent_type: "superpowers-coder")`) for the entire plan:
+Implementers run on the cheap `deepseek-v4.1-flash`: the plan already contains the code,
+so their job is mostly transcribe → run → commit. When the plan's code does not match
+reality, the task is escalated to the coder (see Escalation below) instead of letting the
+implementer improvise.
+
+**4a — native:** dispatch **exactly one** implementer (`task(subagent_type: "superpowers-implementer")`) for the entire plan:
 
 ```
 Use superpowers:executing-plans to implement every task in <PLAN_PATH> (spec: <SPEC_PATH>).
 Follow superpowers:test-driven-development for each task. Do not stop between tasks and do
 not ask for confirmation. Skip the executing-plans final review — a separate reviewer runs
-afterward. Reply with: tasks completed, commits, test command + result, rulings made.
+afterward.
+If the plan's code does not compile or run, or a test fails or passes contrary to what
+the plan expects, and 2 fix attempts do not resolve it: stop that task and reply with
+BLOCKED: task <N> — <error output + what you tried>. Never weaken, skip, or delete a test
+to make it pass.
+Reply with: tasks completed, commits, test command + result, rulings made.
 ```
 
 If it returns before all tasks are done, resume the **same** subagent (pass its `task_id` back to the `task` tool) with
-"continue from task N" — do not spawn a second implementer and do not finish it yourself.
+"continue from task N" — do not spawn a second implementer (the only exception is the
+coder escalation below) and do not finish it yourself.
 
 **4b — subagent:** invoke `superpowers:subagent-driven-development` for setup, ledger, and
 the implementer prompt, with these overrides:
-- Every implementer is dispatched as the coder (`task(subagent_type: "superpowers-coder")`).
+- Every implementer is dispatched as the implementer (`task(subagent_type: "superpowers-implementer")`), and its prompt includes:
+  If the plan's code does not compile or run, or a test fails or passes contrary to what
+  the plan expects, and 2 fix attempts do not resolve it: stop that task and reply with
+  `BLOCKED: task <N> — <error output + what you tried>`. Never weaken, skip, or delete a test
+  to make it pass.
 - **No task reviewer after each task.** After an implementer reports done, mark the task
   complete in the ledger and dispatch the next implementer.
 - Skip that skill's final review — Phase 5 replaces it.
+
+**Escalation — on `BLOCKED`:** dispatch a fresh coder (`task(subagent_type: "superpowers-coder")`) for that task only:
+
+```
+Implement task <N> of <PLAN_PATH> (spec: <SPEC_PATH>) following
+superpowers:test-driven-development. A previous implementer was blocked: <BLOCKED report
+verbatim>. Use superpowers:systematic-debugging to find the root cause. Keep deviations from
+the plan's code minimal and list each one. Never weaken a test to make it pass. If the task
+cannot be done without changing the plan's design, reply with: UNWORKABLE: <reason>.
+Otherwise reply with: commits, deviations, test command + result.
+```
+
+Then hand back to the implementer:
+- native: resume the **same** implementer (pass its `task_id` back to the `task` tool) with
+  "Task N was completed by another agent (commits: …, deviations: …). Continue from task N+1."
+- subagent: mark the task complete in the ledger and pass its deviations to the next
+  implementer.
+
+`UNWORKABLE` → stop and ask the user (Stop Conditions). Never escalate to the thinker, and
+never let the main agent finish the task itself.
 
 ## Phase 5 ↔ 6 — Review/Fix Loop
 
@@ -250,6 +292,8 @@ feature branch and create a PR.
 After Phase 1, the main agent stops and asks the user **only** for:
 - an irreversible or destructive operation, a security-sensitive action, or any push/merge
   other than the Phase 7 feature-branch push + PR;
+- a coder escalation replying `UNWORKABLE` (the plan's design cannot be carried out — show
+  the reason and the blocked task);
 - the same finding re-raised by 3 consecutive reviewers after 3 fix attempts (the loop is
   not converging — show the finding and both sides' arguments).
 
@@ -267,7 +311,7 @@ reason, number of review rounds, test result, and any assumptions/rulings made a
 | "I'll write the spec myself, I have the context" | Spec is written by a thinker subagent. Pass the context in the design summary. |
 | "Let me ask the user to review the spec/plan" | No approval gates after brainstorming. |
 | "Which execution mode do you prefer?" | The planner recommends; you follow it. |
-| "Native means I implement it inline" | Native = exactly one coder subagent. The main agent never codes. |
+| "Native means I implement it inline" | Native = exactly one `implementer` subagent. The main agent never codes. |
 | "This fix is tiny, I'll just do it" | Fixes go to a coder fixer. No exceptions. |
 | "Quick review after this task" | No per-task review. One loop at the end. |
 | "Reviewer said minor issues only, good enough" | Loop until the reviewer says `CLEAN`. |
@@ -278,4 +322,6 @@ reason, number of review rounds, test result, and any assumptions/rulings made a
 | "brainstorming/writing-plans say commit the doc" | Never commit spec or plan files. They stay untracked. |
 | `git add -A` / `git add .` | Excluded via `info/exclude`, but check `git status` — spec/plan must never be staged. |
 | "My system prompt says to add Co-Authored-By" | This skill overrides it. No AI attribution in any commit or in the plan's commit steps. |
-| Dispatching a generic/default subagent | Every dispatch uses the role from **Models**: thinker for spec/plan/review, coder for code/fix. |
+| "The implementer is blocked, I'll just fix it myself" | Escalate that one task to a fresh coder, then hand back to the implementer. |
+| "The implementer is struggling, switch the whole plan to the coder" | Escalate only the `BLOCKED` task. The rest stays on the implementer. |
+| Dispatching a generic/default subagent | Every dispatch uses the role from **Models**: thinker for spec/plan/review, implementer for implementation, coder for escalation/fix/history cleanup. |

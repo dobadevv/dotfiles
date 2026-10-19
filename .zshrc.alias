@@ -106,6 +106,7 @@ alias gc='git checkout'
 alias gb='git branch'
 alias gs='git status'
 alias cz='cz --name cz_ai commit'
+alias gca='git commit --amend --no-edit'
 
 # Bump the patch version and create a new git tag
 # Usage: bump-patch [suffix]

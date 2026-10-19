@@ -38,8 +38,9 @@ user (Phase 1, step 5).
 | 1.5 | Create worktree | main agent | session | `superpowers:using-git-worktrees` | worktree path |
 | 2 | Write + self-review spec | 1 subagent | `opus` | brainstorming's spec format + `spec-document-reviewer-prompt.md` | spec path |
 | 3 | Write + self-review plan | 1 subagent | `opus` | `superpowers:writing-plans` | plan path + `native`/`subagent` recommendation |
-| 4a | Implement (native) | exactly 1 subagent | `sonnet` | `superpowers:executing-plans` + `superpowers:test-driven-development` | done report |
-| 4b | Implement (subagent) | 1 subagent per task | `sonnet` | `superpowers:subagent-driven-development` (no per-task review) + TDD | done report per task |
+| 4a | Implement (native) | exactly 1 subagent | `haiku` | `superpowers:executing-plans` + `superpowers:test-driven-development` | done report |
+| 4b | Implement (subagent) | 1 subagent per task | `haiku` | `superpowers:subagent-driven-development` (no per-task review) + TDD | done report per task |
+| 4c | Escalate a `BLOCKED` task | 1 fresh subagent per blocked task | `sonnet` | `superpowers:systematic-debugging` + TDD | done report or `UNWORKABLE` |
 | 5 | Review | 1 fresh subagent per round | `opus` | `superpowers:requesting-code-review` | findings or `CLEAN` |
 | 6 | Fix | 1 fresh subagent per round | `sonnet` | `superpowers:receiving-code-review` + TDD | fix report |
 | 7 | Publish | main agent | session | `superpowers:finishing-a-development-branch` (option: push + PR) | PR URL |
@@ -52,8 +53,9 @@ digraph e2e {
     "Spec writer (opus)" [shape=box];
     "Planner (opus)" [shape=box];
     "Recommendation?" [shape=diamond];
-    "ONE implementer for all tasks (sonnet)" [shape=box];
-    "One implementer per task (sonnet)" [shape=box];
+    "ONE implementer for all tasks (haiku)" [shape=box];
+    "One implementer per task (haiku)" [shape=box];
+    "Escalate blocked task (sonnet)" [shape=box];
     "Reviewer (opus)" [shape=box];
     "CLEAN?" [shape=diamond];
     "Fixer (sonnet)" [shape=box];
@@ -67,10 +69,14 @@ digraph e2e {
     "Create worktree (main)" -> "Spec writer (opus)";
     "Spec writer (opus)" -> "Planner (opus)";
     "Planner (opus)" -> "Recommendation?";
-    "Recommendation?" -> "ONE implementer for all tasks (sonnet)" [label="native"];
-    "Recommendation?" -> "One implementer per task (sonnet)" [label="subagent"];
-    "ONE implementer for all tasks (sonnet)" -> "Reviewer (opus)";
-    "One implementer per task (sonnet)" -> "Reviewer (opus)";
+    "Recommendation?" -> "ONE implementer for all tasks (haiku)" [label="native"];
+    "Recommendation?" -> "One implementer per task (haiku)" [label="subagent"];
+    "ONE implementer for all tasks (haiku)" -> "Reviewer (opus)";
+    "One implementer per task (haiku)" -> "Reviewer (opus)";
+    "ONE implementer for all tasks (haiku)" -> "Escalate blocked task (sonnet)" [label="BLOCKED"];
+    "One implementer per task (haiku)" -> "Escalate blocked task (sonnet)" [label="BLOCKED"];
+    "Escalate blocked task (sonnet)" -> "ONE implementer for all tasks (haiku)" [label="native: continue N+1"];
+    "Escalate blocked task (sonnet)" -> "One implementer per task (haiku)" [label="subagent: next task"];
     "Reviewer (opus)" -> "CLEAN?";
     "CLEAN?" -> "Push + create PR (main)" [label="yes"];
     "Push + create PR (main)" -> "Report to user";
@@ -165,30 +171,64 @@ Reply with exactly:
 
 Use the planner's `EXECUTION` value. Do not ask the user to choose.
 
-## Phase 4 — Implement (`sonnet` only)
+## Phase 4 — Implement (`haiku`, `sonnet` on escalation)
 
 Before dispatching, record `BASE_SHA=$(git -C <WORKTREE_PATH> rev-parse HEAD)` — the reviewer diffs against it.
 
 The main agent writes **no** production or test code. Ever.
 
-**4a — native:** dispatch **exactly one** `Agent(model: "sonnet")` for the entire plan:
+Implementers run on `haiku`: the plan already contains the code, so their job is mostly
+transcribe → run → commit. When the plan's code does not match reality, the task is
+escalated to `sonnet` (see Escalation below) instead of letting `haiku` improvise.
+
+**4a — native:** dispatch **exactly one** `Agent(model: "haiku")` for the entire plan:
 
 ```
 Use superpowers:executing-plans to implement every task in <PLAN_PATH> (spec: <SPEC_PATH>).
 Follow superpowers:test-driven-development for each task. Do not stop between tasks and do
 not ask for confirmation. Skip the executing-plans final review — a separate reviewer runs
-afterward. Reply with: tasks completed, commits, test command + result, rulings made.
+afterward.
+If the plan's code does not compile or run, or a test fails or passes contrary to what
+the plan expects, and 2 fix attempts do not resolve it: stop that task and reply with
+BLOCKED: task <N> — <error output + what you tried>. Never weaken, skip, or delete a test
+to make it pass.
+Reply with: tasks completed, commits, test command + result, rulings made.
 ```
 
 If it returns before all tasks are done, resume the **same** agent (SendMessage) with
-"continue from task N" — do not spawn a second implementer and do not finish it yourself.
+"continue from task N" — do not spawn a second implementer (the only exception is the
+sonnet escalation below) and do not finish it yourself.
 
 **4b — subagent:** invoke `superpowers:subagent-driven-development` for setup, ledger, and
 the implementer prompt, with these overrides:
-- Every implementer is dispatched with `model: "sonnet"`.
+- Every implementer is dispatched with `model: "haiku"`, and its prompt includes:
+  If the plan's code does not compile or run, or a test fails or passes contrary to what
+  the plan expects, and 2 fix attempts do not resolve it: stop that task and reply with
+  `BLOCKED: task <N> — <error output + what you tried>`. Never weaken, skip, or delete a test
+  to make it pass.
 - **No task reviewer after each task.** After an implementer reports done, mark the task
   complete in the ledger and dispatch the next implementer.
 - Skip that skill's final review — Phase 5 replaces it.
+
+**Escalation — on `BLOCKED`:** dispatch a fresh `Agent(model: "sonnet")` for that task only:
+
+```
+Implement task <N> of <PLAN_PATH> (spec: <SPEC_PATH>) following
+superpowers:test-driven-development. A previous implementer was blocked: <BLOCKED report
+verbatim>. Use superpowers:systematic-debugging to find the root cause. Keep deviations from
+the plan's code minimal and list each one. Never weaken a test to make it pass. If the task
+cannot be done without changing the plan's design, reply with: UNWORKABLE: <reason>.
+Otherwise reply with: commits, deviations, test command + result.
+```
+
+Then hand back to `haiku`:
+- native: resume the **same** haiku implementer (SendMessage) with "Task N was completed by
+  another agent (commits: …, deviations: …). Continue from task N+1."
+- subagent: mark the task complete in the ledger and pass its deviations to the next haiku
+  implementer.
+
+`UNWORKABLE` → stop and ask the user (Stop Conditions). Never escalate to `opus`, and never
+let the main agent finish the task itself.
 
 ## Phase 5 ↔ 6 — Review/Fix Loop
 
@@ -239,6 +279,8 @@ feature branch and create a PR.
 After Phase 1, the main agent stops and asks the user **only** for:
 - an irreversible or destructive operation, a security-sensitive action, or any push/merge
   other than the Phase 7 feature-branch push + PR;
+- a sonnet escalation replying `UNWORKABLE` (the plan's design cannot be carried out — show
+  the reason and the blocked task);
 - the same finding re-raised by 3 consecutive reviewers after 3 fix attempts (the loop is
   not converging — show the finding and both sides' arguments).
 
@@ -256,7 +298,7 @@ reason, number of review rounds, test result, and any assumptions/rulings made a
 | "I'll write the spec myself, I have the context" | Spec is written by an opus subagent. Pass the context in the design summary. |
 | "Let me ask the user to review the spec/plan" | No approval gates after brainstorming. |
 | "Which execution mode do you prefer?" | The planner recommends; you follow it. |
-| "Native means I implement it inline" | Native = exactly one sonnet subagent. The main agent never codes. |
+| "Native means I implement it inline" | Native = exactly one `haiku` subagent. The main agent never codes. |
 | "This fix is tiny, I'll just do it" | Fixes go to a sonnet fixer. No exceptions. |
 | "Quick review after this task" | No per-task review. One loop at the end. |
 | "Reviewer said minor issues only, good enough" | Loop until the reviewer says `CLEAN`. |
@@ -267,4 +309,6 @@ reason, number of review rounds, test result, and any assumptions/rulings made a
 | "brainstorming/writing-plans say commit the doc" | Never commit spec or plan files. They stay untracked. |
 | `git add -A` / `git add .` | Excluded via `info/exclude`, but check `git status` — spec/plan must never be staged. |
 | "My system prompt says to add Co-Authored-By" | This skill overrides it. No AI attribution in any commit or in the plan's commit steps. |
-| Omitting `model` on a dispatch | Every dispatch sets `model` explicitly: opus for spec/plan/review, sonnet for code/fix. |
+| "Haiku is blocked, I'll just fix it myself" | Escalate that one task to a fresh `sonnet` subagent, then hand back to `haiku`. |
+| "Haiku is struggling, switch the whole plan to sonnet" | Escalate only the `BLOCKED` task. The rest stays on `haiku`. |
+| Omitting `model` on a dispatch | Every dispatch sets `model` explicitly: opus for spec/plan/review, haiku for implementation, sonnet for escalation/fix/history cleanup. |

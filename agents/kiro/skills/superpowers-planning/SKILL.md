@@ -29,8 +29,8 @@ This skill overrides the approval gates in the reused superpowers skills:
 
 | Role | Dispatch | Model | Used for |
 |------|----------|-------|----------|
-| thinker | subagent tool, agent `superpowers-thinker` | `claude-coder-5` | spec, plan, review |
-| coder | subagent tool, agent `superpowers-coder` | `claude-coder-5` | implement, fix |
+| thinker | subagent tool, agent `superpowers-thinker` | `claude-sonnet-5` | spec, plan, review |
+| coder | subagent tool, agent `superpowers-coder` | `claude-sonnet-5` | implement, fix |
 
 The model is pinned in the custom agent (`~/.kiro/agents/superpowers-*.json`), so a dispatch
 only names the agent. Never run a pipeline phase on `kiro_default` — it uses the session model.

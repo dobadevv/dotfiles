@@ -30,7 +30,8 @@ This skill overrides the approval gates in the reused superpowers skills:
 | Role | Dispatch | Model | Used for |
 |------|----------|-------|----------|
 | thinker | `task` tool, `subagent_type: "superpowers-thinker"` | `opencode-go/glm-5.3` | spec, plan, review |
-| coder | `task` tool, `subagent_type: "superpowers-coder"` | `opencode-go/deepseek-v4-flash` | implement, fix |
+| implementer | `task` tool, `subagent_type: "superpowers-implementer"` | `opencode-go/deepseek-v4.1-flash` | implement plan tasks |
+| coder | `task` tool, `subagent_type: "superpowers-coder"` | `opencode-go/deepseek-v4-pro` | blocked-task escalation, fix, history cleanup |
 
 The model is pinned in the subagent definition (`~/.config/opencode/agents/superpowers-*.md`),
 so a dispatch only names the subagent. Never run a pipeline phase on the built-in `general`

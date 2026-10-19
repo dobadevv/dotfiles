@@ -1,7 +1,7 @@
 ---
-description: Superpowers pipeline coder — implements plans and fixes review findings. Dispatch only from the superpowers-e2e, superpowers-planning, or superpowers-implementation skill.
+description: Superpowers pipeline coder — takes over blocked tasks, fixes review findings, cleans up branch history. Dispatch only from the superpowers-e2e, superpowers-planning, or superpowers-implementation skill.
 mode: subagent
-model: opencode-go/deepseek-v4-flash
+model: opencode-go/deepseek-v4-pro
 ---
 
 You run exactly one phase of a superpowers-e2e, superpowers-planning, or superpowers-implementation pipeline.

@@ -8,6 +8,7 @@ return {
           { "<leader>db",  function() require("dap").toggle_breakpoint() end,                  desc = "Toggle breakpoint" },
           { "<leader>dc",  function() require("dap").continue() end,                           desc = "Continue" },
           { "<leader>dt",  function() require("dap").terminate() require("dapui").close() end, desc = "Terminate" },
+          { "<leader>dh",  function() require("dap.ui.widgets").hover() end,                   desc = "Debug: Hover", mode = { "n", "v" } },
         },
         config = function()
           local dap = require("dap")
@@ -49,6 +50,7 @@ return {
           end
 
           vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DiagnosticError" })
+          vim.fn.sign_define("DapBreakpointRejected", { text = "○", texthl = "DiagnosticWarn" })
           vim.fn.sign_define("DapStopped", { text = "▶", texthl = "DiagnosticOk", linehl = "Visual" })
 
           local dapui = require("dapui")

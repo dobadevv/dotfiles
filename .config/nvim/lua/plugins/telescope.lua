@@ -25,7 +25,12 @@ return {
 					".next",
 					"coverage",
                     ".venv",
-                    "__pycache__"
+                    "__pycache__",
+                    "docs/superpowers",
+                    ".superpowers",
+                    "*.test.*",
+                    "*.spec.*",
+                    "*_test.go",
 				},
 			},
 		})
