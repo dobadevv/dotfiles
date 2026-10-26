@@ -210,6 +210,7 @@ function reset_claude() {
   rm -rf ~/.claude
 }
 alias clauded="claude --dangerously-skip-permissions"
+alias claude_reset_projects='jq "del(.projects)" ~/.claude.json > ~/.claude.json.tmp && mv ~/.claude.json.tmp ~/.claude.json'
 
 # Codex 
 alias codexed="codex --dangerously-bypass-approvals-and-sandbox"

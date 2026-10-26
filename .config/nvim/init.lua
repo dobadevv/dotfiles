@@ -1,5 +1,6 @@
 -- Set leader key to space (most popular choice)
 vim.g.mapleader = " "
+vim.g.maplocalleader = ","
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"

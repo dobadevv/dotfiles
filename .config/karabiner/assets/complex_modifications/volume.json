@@ -1,0 +1,34 @@
+{
+  "title": "Control +/- volume",
+  "rules": [
+    {
+      "description": "Control + '-' = Volume Down, Control + '+' = Volume Up",
+      "manipulators": [
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "hyphen",
+            "modifiers": { "mandatory": ["control"], "optional": ["caps_lock"] }
+          },
+          "to": [{ "consumer_key_code": "volume_decrement" }]
+        },
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "equal_sign",
+            "modifiers": { "mandatory": ["control"], "optional": ["caps_lock"] }
+          },
+          "to": [{ "consumer_key_code": "volume_increment" }]
+        },
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "equal_sign",
+            "modifiers": { "mandatory": ["control", "shift"], "optional": ["caps_lock"] }
+          },
+          "to": [{ "consumer_key_code": "volume_increment" }]
+        }
+      ]
+    }
+  ]
+}

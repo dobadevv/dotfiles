@@ -93,3 +93,45 @@ vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 
+local buffer_watchers = {}
+
+local function stop_watching(bufnr)
+  local handle = buffer_watchers[bufnr]
+  if not handle then return end
+
+  buffer_watchers[bufnr] = nil
+  if not handle:is_closing() then
+    handle:stop()
+    handle:close()
+  end
+end
+
+local function watch_buffer(bufnr)
+  stop_watching(bufnr)
+
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  if path == "" then return end
+
+  local handle = vim.uv.new_fs_event()
+  if not handle then return end
+  buffer_watchers[bufnr] = handle
+
+  handle:start(path, {}, vim.schedule_wrap(function(err)
+    if err or not vim.api.nvim_buf_is_valid(bufnr) then
+      stop_watching(bufnr)
+      return
+    end
+    vim.cmd("checktime " .. bufnr)
+    -- Atomic writes (write temp + rename) swap the inode, which leaves this
+    -- handle watching a dead file, so re-arm it on the new one.
+    watch_buffer(bufnr)
+  end))
+end
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+  callback = function(args) watch_buffer(args.buf) end,
+})
+
+vim.api.nvim_create_autocmd({ "BufUnload", "BufDelete" }, {
+  callback = function(args) stop_watching(args.buf) end,
+})

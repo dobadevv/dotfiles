@@ -75,8 +75,8 @@ return {
           dapui.setup({
             layouts = {
               {
-                position = "left",
-                size = 40,
+                position = "bottom",
+                size = 20,
                 elements = {
                   { id = "scopes" },
                 },

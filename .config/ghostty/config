@@ -11,7 +11,7 @@ macos-titlebar-style = hidden
 # Tuỳ chọn: tự copy khi bôi đen
 copy-on-select = clipboard
 
-# Tuỳ chọn (tương đương 2 dòng đang comment trong wezterm)
+# Nền trong suốt + blur
 # background-opacity = 0.5
 # background-blur-radius = 50
 
