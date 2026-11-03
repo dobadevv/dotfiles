@@ -75,6 +75,10 @@ local live_grep = function()
             "--no-ignore",
             "--glob", "!node_modules/**",
             "--glob", "!dist/**",
+            "--glob", "!*.test.*",
+            "--glob", "!*.spec.*",
+            "--glob", "!pnpm-lock.yaml",
+            "--glob", "!*.md",
         },
     })
 end

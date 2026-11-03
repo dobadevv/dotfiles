@@ -1,0 +1,16 @@
+key,started,project,name,cost_usd,turns,agent_minutes,tokens_total,tokens_output,reuse_pct,reused,new,callers_open,tests,level,model
+6841ed40-1793269289927,2026-10-29 17:21,smartpos-web,Check lại design trong ~/Downloads/spos-60 xem có lệch gì nữ,9.69,21,15.4,28799571,223200,0,0,10,0,235 passed,full,claude-sonnet-5-5
+6c667277-1793290358076,2026-10-29 23:12,smartpos-web,"<pasted_content id=""2143"">",0.32,3,1.5,900829,3193,,0,0,0,238 passed,full,claude-sonnet-5-5
+0fef8f4e-1793292782056,2026-10-29 23:53,smartpos-web,"ok, bắt đầu code đi",8.03,18,12.3,19533066,114772,14,1,6,0,230 passed,full,claude-opus-5-5
+b51c0596-1793330856332,2026-10-30 10:27,smartpos-web,"<pasted_content id=""d2c9"">",0.73,3,1.7,796679,5097,,0,0,0,51 passed,full,claude-opus-5-5
+b2739019-1793331026292,2026-10-30 10:30,smartpos-web,Scan source và nói cho tôi biết làm sao để test được luồng m,0.46,2,0.6,222610,2647,,0,0,0,not run,full,claude-opus-5-5
+49dfb96d-1793337947731,2026-10-30 12:25,smartpos-web,ok,8.41,11,12.8,19902398,172218,,0,1,0,234 passed,full,claude-opus-5-5
+cc1b3b1a-1793345078291,2026-10-30 14:24,smartpos-web,"<pasted_content id=""e994"">",0.89,4,2.7,1371275,5104,,0,0,0,430 passed,full,claude-opus-5-5
+026a645e-1793349436767,2026-10-30 15:37,smartpos-web,"ok duyệt, code đi",15.29,13,12.0,31955888,245089,,0,0,0,274 passed,full,claude-opus-5-5
+0031024b-1793454491550,2026-10-31 20:48,smartpos-web,`x-forwarded-host` header with value `dmkttxmt-3001.asse.dev,0.67,1,0.5,357095,1856,,0,0,0,not run,full,claude-opus-5-5
+2429d431-1793455279373,2026-10-31 21:01,smartpos-web,Hiện tại chức năng upload hình ảnh đang bị lỗi trên thiết bị,4.00,7,11.5,6138509,37009,25,1,3,0,stale,full,claude-opus-5-5
+312c3fc3-1793456745112,2026-10-31 21:25,smartpos-web,@src/features/categories/components/category-row/category-ro,12.12,27,28.9,33368137,99454,,0,0,0,777 passed,full,claude-opus-5-5
+801a70eb-1793611252853,2026-11-02 16:20,smartpos-web,"Mobile và Tablet, màn hình đầu tiên nếu chưa login chắc chắn",15.83,27,34.1,41996296,150179,,0,0,0,283 passed,full,claude-opus-5-5
+892ad195-1793616436206,2026-11-02 17:47,smartpos-web,Làm sao để restore ticket đã archive trên Jira?,0.61,3,0.9,476922,3141,,0,0,0,not run,full,claude-opus-5-5
+07a40fb1-1793626296930,2026-11-02 20:31,smartpos-web,Replace icon with ~/Downloads/smartpos-icons-sp,0.68,1,0.5,361535,1514,,0,0,0,37 passed,full,claude-opus-5-5
+883df49b-1793627831783,2026-11-02 20:57,smartpos-web,@src/features/cart/components/checkout-box/checkout-box.tsx ,0.63,4,0.7,754427,3206,,0,0,0,23 passed,full,claude-opus-5-5

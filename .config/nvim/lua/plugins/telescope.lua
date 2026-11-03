@@ -31,6 +31,8 @@ return {
                     "*.test.*",
                     "*.spec.*",
                     "*_test.go",
+                    ".codegraph",
+                    ".serena",
 				},
 			},
 		})

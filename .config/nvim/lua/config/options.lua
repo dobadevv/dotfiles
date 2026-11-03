@@ -39,16 +39,23 @@ vim.opt.relativenumber = true
 -- Term GUI color
 vim.opt.termguicolors = true
 
--- Colorscheme
-vim.cmd.colorscheme("catppuccin-mocha")
+-- Transparent background, re-applied whenever Themery switches the colorscheme
+local function clear_backgrounds()
+	vim.cmd([[
+	  hi Normal guibg=NONE ctermbg=NONE
+	  hi NormalNC guibg=NONE ctermbg=NONE
+	  hi NormalFloat guibg=NONE ctermbg=NONE
+	  hi SignColumn guibg=NONE ctermbg=NONE
+	  hi StatusLine guibg=NONE ctermbg=NONE
+	]])
+end
+vim.api.nvim_create_autocmd("ColorScheme", { callback = clear_backgrounds })
 
-vim.cmd([[
-  hi Normal guibg=NONE ctermbg=NONE
-  hi NormalNC guibg=NONE ctermbg=NONE
-  hi NormalFloat guibg=NONE ctermbg=NONE
-  hi SignColumn guibg=NONE ctermbg=NONE
-  hi StatusLine guibg=NONE ctermbg=NONE
-]])
+-- Colorscheme is restored by Themery; fall back to catppuccin before a theme has been picked
+if vim.g.colors_name == nil or vim.g.colors_name == "default" then
+	vim.cmd.colorscheme("catppuccin-mocha")
+end
+clear_backgrounds()
 
 -- Diagnostic configuration for inline errors
 vim.diagnostic.config({

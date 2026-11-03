@@ -1,0 +1,3 @@
+key,started,project,name,cost_usd,turns,agent_minutes,tokens_total,tokens_output,reuse_pct,reused,new,callers_open,tests,level,model
+705e9e31-1793336695981,2026-10-30 12:04,smartpos-be,ok,8.49,13,8.2,14959776,117835,,0,0,0,71 passed,full,claude-opus-5-5
+c66b7cf7-1793346710045,2026-10-30 14:51,smartpos-be,"Khoan, không có chức năng thông tin tiệm, tôi copy nhầm đó",6.54,10,5.7,11981333,100106,,0,0,0,73 passed,full,claude-opus-5-5

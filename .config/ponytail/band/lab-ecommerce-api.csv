@@ -1,0 +1,11 @@
+key,started,project,name,cost_usd,turns,agent_minutes,tokens_total,tokens_output,reuse_pct,reused,new,callers_open,tests,level,model
+e3dec755-1793268055280,2026-10-29 17:00,lab-ecommerce-api,<task-notification>,3.43,11,6.5,8854944,53381,,0,0,0,70 passed,full,claude-sonnet-5-5
+dc1c125f-1793586618110,2026-11-02 09:30,lab-ecommerce-api,@.kiro/skills/start-b5-build/SKILL.md DSIP-10465,1.16,5,1.7,1531894,6603,,0,0,0,not run,full,claude-opus-5-5
+f67c689a-1793591445284,2026-11-02 10:50,lab-ecommerce-api,"<pasted_content id=""d672"">",0.93,3,1.9,955147,8099,,0,0,0,1 passed,full,claude-opus-5-5
+488d307d-1793594114145,2026-11-02 11:35,lab-ecommerce-api,,0.39,2,0.5,273377,950,,0,0,0,not run,full,claude-opus-5-5
+effd3112-1793603415708,2026-11-02 14:10,lab-ecommerce-api,Fix unit test,0.57,3,1.5,577255,2721,,0,0,0,758 passed,full,claude-opus-5-5
+cc9540c8-1793606867689,2026-11-02 15:07,lab-ecommerce-api,"<pasted_content id=""e7a4"">",1.13,5,2.5,1676155,9468,,0,0,0,14 passed,full,claude-opus-5-5
+07db5240-1793616716120,2026-11-02 17:51,lab-ecommerce-api,yes,0.63,3,0.8,532701,3220,,0,0,0,15 passed,full,claude-opus-5-5
+36e1f2e2-1793673032659,2026-11-03 09:30,lab-ecommerce-api,"<pasted_content id=""1749"">",2.25,9,5.7,3928026,25605,,0,0,0,153 passed,full,claude-opus-5-5
+95047b1a-1793677322138,2026-11-03 10:42,lab-ecommerce-api,Update unit test,0.68,3,1.6,694642,4478,,0,0,0,7 passed,full,claude-opus-5-5
+3cbe8157-1793681024667,2026-11-03 11:43,lab-ecommerce-api,Check changes and update types and unit test,0.91,3,1.3,1152562,4740,,0,0,0,9 passed,full,claude-opus-5-5

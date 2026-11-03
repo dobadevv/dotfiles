@@ -73,3 +73,28 @@ export class SessionTokenService {
 - A function that other code needs, or that is tested on its own, moves to a `helpers` (or `utils`) file next to the code that uses it, and that file contains only functions.
 - Constants and types are not a style: they follow the project's rules on where constants and types live.
 - Test files are exempt, since specs naturally mix test blocks, fake classes and helper functions.
+
+## At Most Two Parameters
+
+A function or method takes at most 2 parameters. When it needs more, declare a type for the parameters and accept a single object instead.
+
+```ts
+// Don't: more than 2 positional parameters
+function createUser(name: string, email: string, role: UserRole): User { /* ... */ }
+```
+
+```ts
+// Do: one typed params object
+type CreateUserParams = {
+  name: string;
+  email: string;
+  role: UserRole;
+};
+
+function createUser({ name, email, role }: CreateUserParams): User { /* ... */ }
+```
+
+- Applies to functions, arrow functions and class methods.
+- Exempt: constructors, and callbacks whose signature a library dictates (e.g. `reduce((acc, item, index) => ...)`, Express `(err, req, res, next)`). A callback type defined in this codebase is not exempt.
+- Name the type `<FunctionName>Params` (e.g. `CreateUserParams`), using PascalCase.
+- Destructure the object in the signature so the body reads the same as with positional parameters.

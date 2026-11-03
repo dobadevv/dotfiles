@@ -1,0 +1,4 @@
+key,started,project,name,cost_usd,turns,agent_minutes,tokens_total,tokens_output,reuse_pct,reused,new,callers_open,tests,level,model
+d0e7ec6f-1793269371210,2026-10-29 17:22,dotfiles,"@agents/shared/skills/deliver/SKILL.md, thêm cho tôi bước tạ",0.29,1,0.3,130389,2389,,0,0,0,not run,full,claude-sonnet-5-5
+9c04e4f6-1793588847529,2026-11-02 10:07,dotfiles,Thêm rule này vào @agents/shared/rules/typescript.md rằng mộ,1.33,2,3.1,1130170,17684,0,0,5,0,not run,full,claude-opus-5-5
+e6f63198-1793681908099,2026-11-03 11:58,dotfiles,@.config/nvim/lua/config/keymaps.lua Move những keymap thuộc,0.00,0,0.1,0,0,,0,0,0,not run,full,claude-opus-5-5

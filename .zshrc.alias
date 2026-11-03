@@ -154,10 +154,72 @@ function bump_patch() {
 alias kube='kubectl'
 
 # Tmux
-alias work='tmuxall && tmux attach -t dotfiles'
+# alias work='tmuxall && tmux attach -t dotfiles'
+function work() {
+    echo "
+██╗    ██╗███████╗██╗      ██████╗ ██████╗ ███╗   ███╗███████╗    ██████╗  █████╗  ██████╗██╗  ██╗    ███████╗██╗██████╗ 
+██║    ██║██╔════╝██║     ██╔════╝██╔═══██╗████╗ ████║██╔════╝    ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝    ██╔════╝██║██╔══██╗
+██║ █╗ ██║█████╗  ██║     ██║     ██║   ██║██╔████╔██║█████╗      ██████╔╝███████║██║     █████╔╝     ███████╗██║██████╔╝
+██║███╗██║██╔══╝  ██║     ██║     ██║   ██║██║╚██╔╝██║██╔══╝      ██╔══██╗██╔══██║██║     ██╔═██╗     ╚════██║██║██╔══██╗
+╚███╔███╔╝███████╗███████╗╚██████╗╚██████╔╝██║ ╚═╝ ██║███████╗    ██████╔╝██║  ██║╚██████╗██║  ██╗    ███████║██║██║  ██║
+ ╚══╝╚══╝ ╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚══════╝╚═╝╚═╝  ╚═╝
+"
+    tmuxall
+
+    echo "
+██╗  ██╗ █████╗ ██╗   ██╗███████╗     █████╗      ██████╗  ██████╗  ██████╗ ██████╗     ██████╗  █████╗ ██╗   ██╗    ███████╗██╗██████╗ 
+██║  ██║██╔══██╗██║   ██║██╔════╝    ██╔══██╗    ██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗    ██╔══██╗██╔══██╗╚██╗ ██╔╝    ██╔════╝██║██╔══██╗
+███████║███████║██║   ██║█████╗      ███████║    ██║  ███╗██║   ██║██║   ██║██║  ██║    ██║  ██║███████║ ╚████╔╝     ███████╗██║██████╔╝
+██╔══██║██╔══██║╚██╗ ██╔╝██╔══╝      ██╔══██║    ██║   ██║██║   ██║██║   ██║██║  ██║    ██║  ██║██╔══██║  ╚██╔╝      ╚════██║██║██╔══██╗
+██║  ██║██║  ██║ ╚████╔╝ ███████╗    ██║  ██║    ╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝    ██████╔╝██║  ██║   ██║       ███████║██║██║  ██║
+╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝    ╚═╝  ╚═╝     ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝     ╚═════╝ ╚═╝  ╚═╝   ╚═╝       ╚══════╝╚═╝╚═╝  ╚═╝
+"
+
+    sleep 1
+    tmux attach -t dotfiles
+}
+
+function leave() {
+    echo "
+ ██████╗  ██████╗  ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗    ███████╗██╗██████╗ 
+██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝██╔════╝    ██╔════╝██║██╔══██╗
+██║  ███╗██║   ██║██║   ██║██║  ██║██████╔╝ ╚████╔╝ █████╗      ███████╗██║██████╔╝
+██║   ██║██║   ██║██║   ██║██║  ██║██╔══██╗  ╚██╔╝  ██╔══╝      ╚════██║██║██╔══██╗
+╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗    ███████║██║██║  ██║
+ ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝    ╚══════╝╚═╝╚═╝  ╚═╝
+"
+    tmux kill-server
+}
 
 function tmuxall() {
-    for file in ~/.config/tmuxinator/*.yaml; do tmuxinator start "$(basename "$file" .yaml)" --no-attach; done
+    local files=(~/.config/tmuxinator/*.yaml(N))
+    local total=${#files[@]} current=0 name output
+    local failed=()
+
+    if (( total == 0 )); then
+        echo "❌ No tmuxinator projects found in ~/.config/tmuxinator" >&2
+        return 1
+    fi
+
+    for file in "${files[@]}"; do
+        name="$(basename "$file" .yaml)"
+        _tmuxall_progress $current $total "$name"
+        output="$(tmuxinator start "$name" --no-attach 2>&1)" || failed+=("$name: $output")
+        (( current++ ))
+    done
+    _tmuxall_progress $total $total "done"
+    echo
+
+    for failure in "${failed[@]}"; do
+        echo "⚠️  $failure" >&2
+    done
+}
+
+function _tmuxall_progress() {
+    local current=$1 total=$2 label=$3 width=30
+    local filled=$(( current * width / total ))
+    local empty=$(( width - filled ))
+    printf "\r\033[K🚀 [%s%s] %d/%d %s" "${(l:filled::█:)}" "${(l:empty::░:)}" $current $total "$label"
 }
 
 # DBML
@@ -221,6 +283,9 @@ alias opencoded="opencode --auto"
 # Ollama
 alias qwen="ollama launch claude --model qwen3.6:27b"
 
+# Kiro
+alias kiro='kiro-cli chat --trust-all-tools --v2'
+
 # Homebrew
 alias brew_dump="rm -f ~/dotfiles/Brewfile && brew bundle dump --file=~/dotfiles/Brewfile"
 alias brew_restore="brew bundle --file=~/dotfiles/Brewfile"
@@ -277,4 +342,31 @@ argon2.verify(process.env.ARGON2_HASH, process.env.ARGON2_PW)
   .then(ok => { console.log(ok ? 'true' : 'false'); process.exit(ok ? 0 : 1); })
   .catch(err => { console.error(`Invalid hash: ${err.message}`); process.exit(2); });
 EOF
+}
+
+# Theme
+function gfont() {
+  local config="$HOME/.config/ghostty/config"
+  local -a fonts=(
+    "Monaspace Neon NF"
+    "Iosevka Term"
+    "Commit Mono"
+    "Maple Mono NF"
+    "FiraCode Nerd Font"
+    "JetBrainsMono Nerd Font"
+  )
+
+  local choice="$1"
+  if [[ -z $choice ]]; then
+    choice=$(printf '%s\n' "${fonts[@]}" | fzf --prompt="Font: ") || return
+  fi
+  [[ -z $choice ]] && return
+
+  if grep -q '^font-family' "$config" 2>/dev/null; then
+    sed -i.bak "s/^font-family.*/font-family = \"$choice\"/" "$config"
+  else
+    print "font-family = \"$choice\"" >> "$config"
+  fi
+
+  print "Đã đổi sang $choice, nhấn Cmd+Shift+, để reload"
 }
