@@ -97,4 +97,25 @@ function createUser({ name, email, role }: CreateUserParams): User { /* ... */ }
 - Applies to functions, arrow functions and class methods.
 - Exempt: constructors, and callbacks whose signature a library dictates (e.g. `reduce((acc, item, index) => ...)`, Express `(err, req, res, next)`). A callback type defined in this codebase is not exempt.
 - Name the type `<FunctionName>Params` (e.g. `CreateUserParams`), using PascalCase.
-- Destructure the object in the signature so the body reads the same as with positional parameters.
+- Keep the function declaration on a single line whenever possible. That matters most.
+- Destructure in the signature only if the whole declaration still fits on one line (the project's Prettier `printWidth`, default 100).
+- If it would wrap, never let the formatter break the destructuring across lines. Name the parameter `params` and destructure on the first line of the body instead.
+
+```ts
+// Don't: destructuring that wraps the declaration over several lines
+private toComputedFields({
+  labCenter,
+  isMissingCoordinates,
+  now,
+}: ToComputedFieldsParams): LabComputedFields {
+  // ...
+}
+```
+
+```ts
+// Do: one-line declaration, destructure in the body
+private toComputedFields(params: ToComputedFieldsParams): LabComputedFields {
+  const { labCenter, isMissingCoordinates, now } = params;
+  // ...
+}
+```

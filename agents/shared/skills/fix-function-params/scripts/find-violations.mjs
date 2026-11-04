@@ -1,4 +1,5 @@
-// Lists every git-tracked TS/JS function and method implementation (constructors are exempt) with more than 2 parameters.
+// Lists every git-tracked TS/JS function and method implementation (constructors are exempt) with more than 2 parameters,
+// or with a destructured parameter that wraps the declaration over several lines.
 // Usage: node find-violations.mjs [projectRoot]
 // Output: <file>:<line>\t<name>\t<paramCount>\t<tags>; exits 1 when violations exist.
 import { execFileSync } from 'node:child_process';
@@ -45,10 +46,12 @@ function loadTypeScript() {
 function visit(node, sourceFile, file) {
   if (isImplementation(node)) {
     const params = node.parameters.filter((param) => param.name.getText(sourceFile) !== 'this');
-    if (params.length > MAX_PARAMS) {
+    const tags = tagsOf(node);
+    if (params.some((param) => isWrappedDestructuring(param, sourceFile))) tags.push('wrapped-destructuring');
+    if (params.length > MAX_PARAMS || tags.includes('wrapped-destructuring')) {
       violationCount++;
       const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
-      console.log([`${file}:${line + 1}`, nameOf(node, sourceFile), params.length, tagsOf(node).join(',')].join('\t'));
+      console.log([`${file}:${line + 1}`, nameOf(node, sourceFile), params.length, tags.join(',')].join('\t'));
     }
   }
   ts.forEachChild(node, (child) => visit(child, sourceFile, file));
@@ -62,6 +65,12 @@ function isImplementation(node) {
       ts.isMethodDeclaration(node)) &&
     node.body !== undefined
   );
+}
+
+function isWrappedDestructuring(param, sourceFile) {
+  if (!ts.isObjectBindingPattern(param.name)) return false;
+  const lineOf = (position) => sourceFile.getLineAndCharacterOfPosition(position).line;
+  return lineOf(param.name.getStart(sourceFile)) !== lineOf(param.name.getEnd());
 }
 
 function nameOf(node, sourceFile) {

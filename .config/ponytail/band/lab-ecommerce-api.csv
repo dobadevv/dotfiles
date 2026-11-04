@@ -9,3 +9,13 @@ cc9540c8-1793606867689,2026-11-02 15:07,lab-ecommerce-api,"<pasted_content id=""
 36e1f2e2-1793673032659,2026-11-03 09:30,lab-ecommerce-api,"<pasted_content id=""1749"">",2.25,9,5.7,3928026,25605,,0,0,0,153 passed,full,claude-opus-5-5
 95047b1a-1793677322138,2026-11-03 10:42,lab-ecommerce-api,Update unit test,0.68,3,1.6,694642,4478,,0,0,0,7 passed,full,claude-opus-5-5
 3cbe8157-1793681024667,2026-11-03 11:43,lab-ecommerce-api,Check changes and update types and unit test,0.91,3,1.3,1152562,4740,,0,0,0,9 passed,full,claude-opus-5-5
+8b0930ac-1793684263276,2026-11-03 12:37,lab-ecommerce-api,update unit test,0.64,3,1.1,750181,3157,,0,0,0,7 passed,full,claude-opus-5-5
+528d4e8a-1793691286818,2026-11-03 14:34,lab-ecommerce-api,Sửa hết tất cả có API_SERVICE_RSA_ONLINE thành API_SERVICE_R,0.39,2,0.1,141905,506,,0,0,0,not run,full,claude-opus-5-5
+d3fd7c6e-1793691542947,2026-11-03 14:39,lab-ecommerce-api,"Fix conflict, i just merge feat/DSIP-10619-cancel-payment",1.11,6,2.3,1918609,8869,,0,0,0,72 passed,full,claude-opus-5-5
+af4cc3e5-1793693459835,2026-11-03 15:10,lab-ecommerce-api,"<pasted_content id=""18d8"">",0.62,2,1.7,465605,5571,,0,0,0,15 passed,full,claude-opus-5-5
+0e79d50d-1793699310978,2026-11-03 16:48,lab-ecommerce-api,Copy rsa-online trong @src/modules/integrations trong branch,0.60,2,0.4,205207,1140,,0,0,0,1 passed,full,claude-opus-5-5
+57424e71-1793699949502,2026-11-03 16:59,lab-ecommerce-api,update unit test,1.03,5,2.5,1555522,8741,,0,0,0,15 passed,full,claude-opus-5-5
+d4961766-1793700526076,2026-11-03 17:08,lab-ecommerce-api,"Fix conflict for me, i just merged from feat/update-check-pa",0.83,3,1.5,1033352,5234,,0,0,0,72 passed,full,claude-opus-5-5
+f57a69a5-1793760471743,2026-11-04 09:47,lab-ecommerce-api,"<pasted_content id=""bd26"">",2.67,7,8.3,4032325,31184,,0,0,0,70 passed,full,claude-opus-5-5
+c1471637-1793767149925,2026-11-04 11:39,lab-ecommerce-api,Tổng hợp thay đổi từ 2933c9e5a28f8f32e42fad76e40c306e8c45ab5,0.51,2,0.4,295638,1715,,0,0,0,not run,full,claude-opus-5-5
+62a2c012-1793774877406,2026-11-04 13:47,lab-ecommerce-api,yes,1.01,4,1.8,777896,4610,,0,0,0,70 passed,full,claude-opus-5-5

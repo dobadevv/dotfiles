@@ -1,5 +1,3 @@
-local cinnamon = require("cinnamon")
-
 -- Toggle wrap text
 vim.keymap.set("n", "<leader>tw", "<cmd>set wrap!<CR>", { silent = true, desc = "Toggle line wrap" })
 
@@ -15,10 +13,6 @@ vim.keymap.set("n", "U", "<C-r>", { desc = "Redo" })
 -- Search & Highlights
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Clear search highlights" })
 
--- Smooth Scrolling (Cinnamon)
-vim.keymap.set("n", "<C-e>", function() cinnamon.scroll("5<C-e>") end, { silent = true, desc = "Smooth scroll down 5 lines" })
-vim.keymap.set("n", "<C-y>", function() cinnamon.scroll("5<C-y>") end, { silent = true, desc = "Smooth scroll up 5 lines" })
-
 -- Clipboard Operations
 vim.keymap.set({ 'n', 'x' }, '<M-c>', '"+y', { noremap = true, silent = true, desc = 'Copy to clipboard' })
 
@@ -31,7 +25,7 @@ vim.keymap.set("n", "<leader>p", "<C-o>", { silent = true, desc = "Jump back" })
 vim.keymap.set("n", "<leader>n", "<C-i>", { silent = true, desc = "Jump forward" })
 
 -- Checktime
-vim.keymap.set("n", "<leader>r", '<cmd>checktime<CR>', { silent = true, desc = "Restart terminal" })
+vim.keymap.set("n", "<leader>r", '<cmd>checktime<CR><cmd>LspRestart<CR>', { silent = true, desc = "Restart terminal" })
 
 -- Increment/Decrement Numbers
 vim.keymap.set("n", "+", '<C-A>', { silent = true, desc = "Increase" })
@@ -57,108 +51,10 @@ vim.keymap.set("v", ">", ">gv", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>|", "<cmd>vsplit<CR>", { silent = true, desc = "Split vertically" })
 vim.keymap.set("n", "<leader>-", "<cmd>split<CR>", { silent = true, desc = "Split horizontally" })
 
--- Neotree
-vim.keymap.set("n", "<leader>e", ":Neotree toggle<CR>", { silent = true, desc = "Toggle file explorer" })
-
--- Telescope
-local find_files = function()
-    require("telescope.builtin").find_files({
-        hidden = true,
-        no_ignore = true,
-        no_ignore_parent = true,
-    })
-end
-local live_grep = function()
-    require("telescope.builtin").live_grep({
-        additional_args = {
-            "--hidden",
-            "--no-ignore",
-            "--glob", "!node_modules/**",
-            "--glob", "!dist/**",
-            "--glob", "!*.test.*",
-            "--glob", "!*.spec.*",
-            "--glob", "!pnpm-lock.yaml",
-            "--glob", "!*.md",
-        },
-    })
-end
-vim.keymap.set("n", "<leader>ff", find_files, { silent = true, desc = "Find files" })
-vim.keymap.set("n", "<leader>fg", live_grep, { silent = true, desc = "Live grep" })
-
 -- Buffer
 vim.keymap.set("n", "<S-w>", "<CMD>bd<CR>", { silent = true, desc = "Close current buffer" })
 vim.keymap.set("n", "<S-n>", "<CMD>bnext<CR>", { silent = true, desc = "Next buffer" })
 vim.keymap.set("n", "<S-p>", "<CMD>bprev<CR>", { silent = true, desc = "Previous buffer" })
-vim.keymap.set("n", "<S-o>", "<CMD>BufferLineCloseOthers<CR>", { silent = true, desc = "Close other buffer" })
-
--- LSP
-local function optimize_import()
-	vim.lsp.buf.code_action({
-		apply = true,
-		context = {
-			only = { "source.removeUnused" },
-			diagnostics = {},
-		},
-	})
-end
-local function hover()
-    local winid = require("ufo").peekFoldedLinesUnderCursor()
-    if not winid then
-        vim.lsp.buf.hover({
-            border = "rounded",
-        })
-    end
-end
-local function go_to_definition()
-    local params = vim.lsp.util.make_position_params(0, "utf-8")
-    vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result)
-        if err or not result or vim.tbl_isempty(result) then
-            vim.lsp.buf.definition()
-            return
-        end
-        if #result > 1 then
-            require("telescope.builtin").lsp_definitions()
-        else
-            vim.lsp.util.jump_to_location(result[1], "utf-8")
-        end
-    end)
-end
-vim.keymap.set("n", "<leader>gd", go_to_definition, { silent = true, desc = "Go to definition" })
-vim.keymap.set("n", "<leader>gr", require('telescope.builtin').lsp_references, { silent = true, desc = "Go to references" })
-vim.keymap.set("n", "<leader>gi", require("telescope.builtin").lsp_implementations, { silent = true, desc = "Go to implementation" })
-vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { silent = true, desc = "Code action" })
-vim.keymap.set("n", "K", hover, { silent = true, desc = "Hover" })
-vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { silent = true, desc = "Rename" })
-vim.keymap.set("n", "<leader>i", vim.lsp.buf.format, { silent = true, desc = "Format" })
-vim.keymap.set("n", "<leader>o", optimize_import, { silent = true, desc = "Optimize import" })
-vim.keymap.set("n", "<leader>ce", "<CMD>LspEslintFixAll<CR>", { silent = true, desc = "Fix all eslint" })
-vim.keymap.set("n", "<leader>ts", "<cmd>Telescope lsp_document_symbols<CR>")
-
--- Fold 
-vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
-vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
-
--- Lazy tools
-vim.keymap.set("n", "<leader>lg", "<CMD>LazyGit<CR>", { silent = true, desc = "Open LazyGit" })
-vim.keymap.set("n", "<leader>ll", "<CMD>Lazy<CR>", { silent = true, desc = "Open LazyVim" })
-vim.keymap.set("n", "<leader>ls", "<cmd>LazySql<CR>", { desc = "Toggle LazySql", noremap = true, silent = true })
-
--- Git
-vim.keymap.set('n', '<leader>gv', "<CMD>DiffviewOpen<CR>", { silent = true, desc = "Open diff view" })
-vim.keymap.set('n', '<leader>gc', "<CMD>DiffviewClose<CR>", { silent = true, desc = "Close diff view" })
-vim.keymap.set('n', '<leader>gh', "<CMD>DiffviewFileHistory<CR>", { silent = true, desc = "Open file history" })
-vim.keymap.set('n', '<leader>gf', "<CMD>DiffviewFileHistory %<CR>", { silent = true, desc = "Open current file history" })
-vim.keymap.set('n', '<leader>gs', require('telescope.builtin').git_status, { silent = true, desc = "Git status" })
-vim.keymap.set('n', '<leader>gb', require('telescope.builtin').git_branches, { silent = true, desc = "Git branches" })
-vim.keymap.set('n', '<leader>gl', require('telescope.builtin').git_commits, { silent = true, desc = "Git commits" })
-vim.keymap.set('n', '<leader>ga', require('telescope.builtin').git_bcommits, { silent = true, desc = "Git buffer commits" })
-vim.keymap.set('n', '<leader>gxn', "<CMD>GitConflictNextConflict<CR>", { silent = true, desc = "Move to the next conflict" })
-vim.keymap.set('n', '<leader>gxp', "<CMD>GitConflictPrevConflict<CR>", { silent = true, desc = "Move to the previous conflict" })
-vim.keymap.set('n', '<leader>gxo', "<CMD>GitConflictChooseOurs<CR>", { silent = true, desc = "Select the current changes" })
-vim.keymap.set('n', '<leader>gxt', "<CMD>GitConflictChooseTheirs<CR>", { silent = true, desc = "Select the incoming changes" })
-vim.keymap.set('n', '<leader>gxb', "<CMD>GitConflictChooseBoth<CR>", { silent = true, desc = "Select both changes" })
-vim.keymap.set('n', '<leader>gxz', "<CMD>GitConflictChooseNone<CR>", { silent = true, desc = "Select none of the changes" })
-vim.keymap.set('n', '<leader>gxl', "<CMD>GitConflictListQf<CR>", { silent = true, desc = "Get all conflict to quickfix" })
 
 -- Copy
 -- Relative path from the working directory (cwd), in the format Claude Code understands: @path

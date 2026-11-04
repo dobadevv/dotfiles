@@ -1,6 +1,7 @@
 return {
     "declancm/cinnamon.nvim",
     version = "*",
+    lazy = false,
     opts = {
         keymaps = {
             basic = true,
@@ -20,6 +21,13 @@ return {
             },
         },
     },
+    config = function(_, opts)
+        local cinnamon = require("cinnamon")
+        cinnamon.setup(opts)
+        -- Set after setup so they override cinnamon's own "extra" <C-e>/<C-y> keymaps
+        vim.keymap.set("n", "<C-e>", function() cinnamon.scroll("5<C-e>") end, { silent = true, desc = "Smooth scroll down 5 lines" })
+        vim.keymap.set("n", "<C-y>", function() cinnamon.scroll("5<C-y>") end, { silent = true, desc = "Smooth scroll up 5 lines" })
+    end,
     keys = {
         { '<c-d>', '<cmd>lua require("cinnamon").scroll("<C-d>zz")<cr>', mode = 'n', },
         { '<c-u>', '<cmd>lua require("cinnamon").scroll("<C-u>zz")<cr>', mode = 'n', },
@@ -30,7 +38,5 @@ return {
         { 'zb',    '<cmd>lua require("cinnamon").scroll("zb")<cr>',      mode = 'n', },
         { 'gg',    '<cmd>lua require("cinnamon").scroll("gg")<cr>',      mode = 'n', },
         { 'G',    '<cmd>lua require("cinnamon").scroll("G")<cr>',      mode = 'n', },
-        { '<c-e>', '<cmd>lua require("cinnamon").scroll("10<C-e>zz")<cr>', mode = 'n', desc = "Scroll down 10 lines smoothly" },
-        { '<c-y>', '<cmd>lua require("cinnamon").scroll("10<C-y>zz")<cr>', mode = 'n', desc = "Scroll up 10 lines smoothly" },
     }
 }

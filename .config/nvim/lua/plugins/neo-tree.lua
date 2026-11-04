@@ -9,6 +9,9 @@ return {
 			"DaikyXendo/nvim-material-icon",
 		},
 		lazy = false,
+		keys = {
+			{ "<leader>e", "<cmd>Neotree toggle<CR>", silent = true, desc = "Toggle file explorer" },
+		},
 		config = function()
 			require("neo-tree").setup({
 				window = {

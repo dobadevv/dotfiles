@@ -1,11 +1,11 @@
 ---
 name: fix-function-params
-description: Use when asked to audit, find or fix TypeScript/JavaScript functions or methods that take more than 2 parameters, or to bring existing code in line with the "At Most Two Parameters" rule (params object, `<FunctionName>Params` type).
+description: Use when asked to audit, find or fix TypeScript/JavaScript functions or methods that take more than 2 parameters or whose destructured params wrap the declaration over several lines, or to bring existing code in line with the "At Most Two Parameters" rule (params object, `<FunctionName>Params` type).
 ---
 
 # Fix Function Params
 
-Audits a TS/JS codebase for functions with more than 2 parameters and refactors each one to a single typed params object, per the "At Most Two Parameters" rule in the TypeScript rules. This is a refactor: behavior must not change.
+Audits a TS/JS codebase for functions with more than 2 parameters and refactors each one to a single typed params object, per the "At Most Two Parameters" rule in the TypeScript rules. It also catches declarations broken over several lines by a destructured params object; the declaration must stay on one line. This is a refactor: behavior must not change.
 
 ## 1. Audit
 
@@ -22,6 +22,7 @@ Sort each hit into one bucket:
 | Bucket | When | Action |
 |---|---|---|
 | Fix | Plain function or method in this repo | Refactor (step 2) |
+| Fix: wrapped destructuring | `wrapped-destructuring` tag, param count already ≤ 2 | Only step 2.4: switch to `params` and destructure in the body. Call sites do not change |
 | Skip: library callback | `callback` tag and the callee comes from a dependency (`reduce`, Express `(err, req, res, next)`, React `onChange`), or a named function handed to a dependency by reference (`app.use(errorHandler)`) | Leave as is |
 | Fix: own callback | `callback` tag but the callee and its callback type live in this repo | Refactor the callback type, the callee's invocation and every callback together |
 | Skip: implements external contract | Method implements or overrides an interface/class from a dependency | Leave as is |
@@ -38,7 +39,7 @@ Show the user the bucketed list before editing. If they asked only to audit, sto
    - optional `b?: T` → `b?: T`
    - default `c = 1` → `c?: number` in the type, `{ c = 1 }` in the destructuring
    - rest `...args` stays a separate parameter only if the total is then ≤ 2; otherwise becomes `args: T[]`
-4. Destructure in the signature: `function createUser({ name, email, role }: CreateUserParams)`, so the body stays unchanged.
+4. Keep the declaration on one line. Destructure in the signature (`function createUser({ name, email, role }: CreateUserParams)`) only if it fits within the Prettier `printWidth` (default 100). Otherwise use `(params: CreateUserParams)` and put `const { name, email, role } = params;` as the first line of the body.
 5. Update overload signatures together with the implementation.
 6. Rewrite every call site to pass an object: `createUser({ name, email, role })`.
 
@@ -57,3 +58,4 @@ After each file: run the project's typecheck (`tsc --noEmit` or the `typecheck` 
 - Dropping a default value when moving it into the type.
 - Missing call sites in tests, mocks (`toHaveBeenCalledWith(a, b, c)`) and JS files.
 - Changing behavior or renaming parameters in the same pass; keep the refactor mechanical.
+- Destructuring in the signature when the formatter will wrap it, e.g. `toComputedFields({\n labCenter,\n ...\n}: ToComputedFieldsParams)`. Write `toComputedFields(params: ToComputedFieldsParams)` with `const { labCenter, isMissingCoordinates, now } = params;` instead.

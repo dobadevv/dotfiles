@@ -9,3 +9,6 @@ e82c9022-1793604841416,2026-11-02 14:34,lab-order-api,Fix unit test,0.50,3,1.0,4
 40395481-1793606434414,2026-11-02 15:00,lab-order-api,~/projects/frt/lab-ecommerce-api/src/common/guards/auth-cust,0.72,3,1.6,1093743,5158,,0,0,0,15 passed,full,claude-opus-5-5
 75010404-1793616945752,2026-11-02 17:55,lab-order-api,API_SERVICE_CORE_CUSTOMER=http://ci-core-customer-service.lc,0.62,3,0.8,531266,2944,,0,0,0,14 passed,full,claude-opus-5-5
 8196f657-1793672272915,2026-11-03 09:17,lab-order-api,"<pasted_content id=""e5ce"">",1.42,4,2.2,1945143,9538,,0,0,0,14 passed,full,claude-opus-5-5
+8cd77d34-1793690618156,2026-11-03 14:23,lab-order-api,"<pasted_content id=""f16f"">",1.25,5,2.7,1445743,8023,,1,0,0,14 passed,full,claude-opus-5-5
+6f77045a-1793764319900,2026-11-04 10:51,lab-order-api,,0.63,1,0.2,211300,969,,0,0,0,not run,full,claude-opus-5-5
+e1a9c414-1793764474586,2026-11-04 10:54,lab-order-api,Rename @src/modules/orders/controllers/orders.controller.ts ,1.10,3,2.9,1386362,10005,,0,0,0,135 passed,full,claude-opus-5-5
