@@ -1,2 +1,0 @@
-key,started,project,name,cost_usd,turns,agent_minutes,tokens_total,tokens_output,reuse_pct,reused,new,callers_open,tests,level,model
-854f9111-1793633477677,2026-11-02 22:31,marsvenus-connection-be,Check giúp tôi ,4.41,7,12.8,9818662,40663,,0,0,0,passed,full,claude-opus-5-5

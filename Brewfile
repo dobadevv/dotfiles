@@ -6,6 +6,8 @@ tap "ktr0731/evans", trusted: true
 tap "ngrok/ngrok", trusted: true
 tap "osx-cross/arm", trusted: true
 tap "osx-cross/avr", trusted: true
+# Password hashing library and CLI utility
+brew "argon2"
 # Command-line interface for SQLite
 brew "sqlite"
 # Official Amazon AWS command-line interface
@@ -16,8 +18,6 @@ brew "bash"
 brew "bat"
 # Incredibly fast JavaScript runtime, bundler, test runner, and package manager
 brew "bun"
-# Wrap Gemini CLI, Codex, Claude Code, Qwen Code as an API service
-brew "cliproxyapi", restart_service: :changed
 # Dependency manager for Cocoa projects
 brew "cocoapods"
 # Secure runtime for JavaScript and TypeScript
@@ -28,6 +28,8 @@ brew "eza"
 brew "fd"
 # Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
+# Banner-like program prints strings as ASCII art
+brew "figlet"
 # Command-line fuzzy finder written in Go
 brew "fzf"
 # GitHub command-line tool
@@ -54,6 +56,8 @@ brew "graphviz"
 brew "grpcurl"
 # Improved top (interactive process viewer)
 brew "htop"
+# Tools and libraries to manipulate images in select formats
+brew "imagemagick"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
 # Lazier way to manage everything docker
@@ -128,7 +132,19 @@ cask "discord"
 cask "docker-desktop"
 # Collaborative team software
 cask "figma"
+cask "font-fira-code-nerd-font"
+cask "font-iosevka"
 cask "font-jetbrains-mono-nerd-font"
+cask "font-maple-mono"
+cask "font-maple-mono-nf"
+cask "font-maple-mono-nf-cn"
+cask "font-monaspace"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
+# Web browser
+cask "google-chrome"
+# Keyboard customiser
+cask "karabiner-elements"
 # Blocks all Keyboard and TouchBar input
 cask "keyboardcleantool"
 # Agent-centric IDE with spec-driven development
@@ -149,6 +165,8 @@ cask "openvpn-connect"
 cask "raycast"
 # Move and resize windows using keyboard shortcuts or snap areas
 cask "rectangle"
+# Music streaming service
+cask "spotify"
 # Native database client for many database types
 cask "tablepro"
 # Desktop client for Telegram messenger
@@ -175,6 +193,7 @@ vscode "jebbs.plantuml"
 vscode "ms-vscode.vscode-typescript-next"
 vscode "pkief.material-icon-theme"
 vscode "redhat.vscode-yaml"
+vscode "waderyan.gitblame"
 go "github.com/air-verse/air"
 go "github.com/bufbuild/buf/cmd/buf"
 go "github.com/go-delve/delve/cmd/dlv"

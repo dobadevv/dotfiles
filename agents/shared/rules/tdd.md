@@ -9,5 +9,6 @@ Whenever implementing new functionality, fixing bugs, or changing behavior:
 - Write or update tests before production code whenever practical.
 - Every bug fix should include a regression test.
 - Never weaken or disable tests just to make them pass.
+- Aim for 100% test coverage of the code you write or change whenever practical. If some lines genuinely can't be covered, say which ones and why.
 
 Treat test code with the same quality standards as production code.

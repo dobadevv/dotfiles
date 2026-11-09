@@ -1,3 +1,6 @@
+-- Exit from terminal mode
+vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+
 -- Toggle wrap text
 vim.keymap.set("n", "<leader>tw", "<cmd>set wrap!<CR>", { silent = true, desc = "Toggle line wrap" })
 
@@ -112,3 +115,8 @@ vim.keymap.set("n", "<leader>cF", function()
     rel_path(), sr + 1, er + 1, vim.bo.filetype, table.concat(lines, "\n"))
   copy(text, ("Copied function (%d lines)"):format(#lines))
 end, { desc = "Copy function for Claude Code" })
+
+-- Open in browser
+vim.keymap.set("n", "<leader>ob", function()
+  vim.ui.open(vim.fn.expand("%:p"))
+end, { desc = "Open file in browser" })
