@@ -7,23 +7,7 @@ return {
 			vim.keymap.set("n", "<leader>ls", "<cmd>LazySql<CR>", { silent = true, desc = "Toggle LazySql" })
 		end,
 	},
-	{
-		"kdheepak/lazygit.nvim",
-		lazy = true,
-		cmd = {
-			"LazyGit",
-			"LazyGitConfig",
-			"LazyGitCurrentFile",
-			"LazyGitFilter",
-			"LazyGitFilterCurrentFile",
-		},
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
-		keys = {
-			{ "<leader>lg", "<CMD>LazyGit<CR>", silent = true, desc = "Open LazyGit" },
-		},
-	},
+
 	{
 		"mgierada/lazydocker.nvim",
 		dependencies = { "akinsho/toggleterm.nvim" },
@@ -44,5 +28,28 @@ return {
 				desc = "Open Lazydocker floating window",
 			},
 		},
+	},
+
+	{
+		"akinsho/toggleterm.nvim",
+		version = "*",
+		cmd = { "ToggleTerm", "TermExec" },
+		keys = {
+			{ "<leader>tt", "<cmd>ToggleTerm direction=float<cr>", desc = "Terminal float" },
+			{ "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", desc = "Terminal horizontal" },
+			{ "<leader>tv", "<cmd>ToggleTerm direction=vertical size=60<cr>", desc = "Terminal vertical" },
+		},
+		opts = {
+			direction = "float",
+			float_opts = { border = "curved" },
+		},
+	},
+
+	{
+		"rmagatti/auto-session",
+		lazy = false,
+		config = function()
+			require("auto-session").setup({})
+		end,
 	},
 }

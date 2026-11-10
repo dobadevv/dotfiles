@@ -42,4 +42,63 @@ return {
 			{ "<leader>gxl", "<CMD>GitConflictListQf<CR>", silent = true, desc = "Get all conflict to quickfix" },
 		},
 	},
+	{
+		"harrisoncramer/gitlab.nvim",
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+			"sindrets/diffview.nvim",
+			"stevearc/dressing.nvim",
+			"nvim-tree/nvim-web-devicons",
+		},
+		opts = {
+			keymaps = {
+				global = {
+					add_assignee = "<leader>gmaa",
+					delete_assignee = "<leader>gmad",
+					add_label = "<leader>gmla",
+					delete_label = "<leader>gmld",
+					add_reviewer = "<leader>gmra",
+					delete_reviewer = "<leader>gmrd",
+					approve = "<leader>gmA",
+					revoke = "<leader>gmR",
+					merge = "<leader>gmM",
+					set_auto_merge = "<leader>gmm",
+					rebase = "<leader>gmrr",
+					rebase_skip_ci = "<leader>gmrs",
+					rebase_force = "<leader>gmrf",
+					create_mr = "<leader>gmC",
+					choose_merge_request = "<leader>gmc",
+					start_review = "<leader>gmS",
+					reload_review = "<leader>gm<C-R>",
+					close_review = "<leader>gmQ",
+					summary = "<leader>gms",
+					copy_mr_url = "<leader>gmu",
+					open_in_browser = "<leader>gmo",
+					create_note = "<leader>gmn",
+					pipeline = "<leader>gmp",
+					toggle_discussions = "<leader>gmd",
+					toggle_draft_mode = "<leader>gmD",
+					publish_all_drafts = "<leader>gmP",
+				},
+			},
+		},
+	},
+
+	{
+		"kdheepak/lazygit.nvim",
+		lazy = true,
+		cmd = {
+			"LazyGit",
+			"LazyGitConfig",
+			"LazyGitCurrentFile",
+			"LazyGitFilter",
+			"LazyGitFilterCurrentFile",
+		},
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+		},
+		keys = {
+			{ "<leader>lg", "<CMD>LazyGit<CR>", silent = true, desc = "Open LazyGit" },
+		},
+	},
 }

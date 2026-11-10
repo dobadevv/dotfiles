@@ -14,6 +14,7 @@ return {
                 { "<leader>l", icon = "󰒲", desc = "Lazy tools" },
                 { "<leader>f", group = "file/find" },
                 { "<leader>g", group = "git" },
+                { "<leader>gm", group = "gitlab merge request" },
                 { "<leader>c", group = "code" },
                 { "<leader>a", group = "ai/opencode", icon = "" },
                 { "<leader>q", group = "quit" },

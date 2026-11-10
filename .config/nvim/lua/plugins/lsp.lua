@@ -51,8 +51,32 @@ return {
 	},
 
 	{
+		"saghen/blink.cmp",
+		version = "1.*",
+		dependencies = { "L3MON4D3/LuaSnip" },
+		opts = {
+			snippets = { preset = "luasnip" },
+			keymap = {
+				-- blink merges presets by keycode, and <Tab> == <C-i>, so any preset with <Tab> drops <C-i>.
+				preset = "none",
+				["<C-i>"] = { "show", "show_documentation", "hide_documentation" },
+				["<C-n>"] = { "select_next", "fallback" },
+				["<C-p>"] = { "select_prev", "fallback" },
+				["<C-y>"] = { "select_and_accept", "fallback" },
+				["<C-e>"] = { "hide", "fallback" },
+				["<C-b>"] = { "scroll_documentation_up", "fallback" },
+				["<C-f>"] = { "scroll_documentation_down", "fallback" },
+				["<A-j>"] = { "select_next", "snippet_forward", "fallback" },
+				["<A-k>"] = { "select_prev", "snippet_backward", "fallback" },
+				["<CR>"] = { "accept", "fallback" },
+			},
+		},
+	},
+
+	{
 		"neovim/nvim-lspconfig",
 		lazy = false,
+		dependencies = { "saghen/blink.cmp" },
 		keys = {
 			{ "<leader>gd", go_to_definition, silent = true, desc = "Go to definition" },
 			{ "<leader>gr", function() require("telescope.builtin").lsp_references() end, silent = true, desc = "Go to references" },
@@ -66,7 +90,7 @@ return {
 			{ "<leader>ts", "<cmd>Telescope lsp_document_symbols<CR>" },
 		},
 		config = function()
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 			-- Lua LSP
 			vim.lsp.config("lua_ls", {
@@ -146,6 +170,117 @@ return {
 
 			-- Enable LSP servers
 			vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "eslint", "rust_analyzer", "basedpyright", "ruff" })
+		end,
+	},
+
+	{
+		"mason-org/mason.nvim",
+		opts = {},
+	},
+
+	{
+		"jay-babu/mason-null-ls.nvim",
+		config = function()
+			require("mason-null-ls").setup({
+				ensure_installed = {
+					"stylua",
+					"prettierd",
+					"goimports",
+					"eslint_d",
+					"sql_formatter",
+					"ruff_format",
+				},
+			})
+		end,
+	},
+
+	{
+		"nvimtools/none-ls.nvim",
+		dependencies = {
+			"nvimtools/none-ls-extras.nvim",
+		},
+		config = function()
+			local null_ls = require("null-ls")
+			local utils = require("null-ls.utils")
+
+			null_ls.setup({
+				root_dir = utils.root_pattern("eslint.config.mjs", "package.json", ".git"),
+
+				on_attach = function(client)
+					if client.name == "null-ls" then
+						client.server_capabilities.documentFormattingProvider = false
+					end
+				end,
+
+				sources = {
+					null_ls.builtins.formatting.stylua,
+					null_ls.builtins.formatting.goimports,
+					null_ls.builtins.formatting.prettierd,
+					null_ls.builtins.formatting.sql_formatter,
+					require("none-ls.formatting.ruff_format"),
+
+					-- Linters
+					require("none-ls.diagnostics.eslint_d").with({
+						prefer_local = "node_modules/.bin",
+						extra_args = {
+							"--config",
+							"eslint.config.mjs",
+						},
+					}),
+				},
+			})
+		end,
+	},
+
+	{
+		"L3MON4D3/LuaSnip",
+		version = "v2.*",
+		build = "make install_jsregexp",
+		dependencies = {
+			"rafamadriz/friendly-snippets",
+		},
+		config = function()
+			require("luasnip.loaders.from_vscode").lazy_load()
+		end,
+	},
+
+	{
+		"nvim-treesitter/nvim-treesitter",
+		branch = "master",
+		lazy = false,
+		build = ":TSUpdate",
+		config = function()
+			require("nvim-treesitter.configs").setup({
+				ensure_installed = {
+					"lua",
+					"javascript",
+					"typescript",
+					"go",
+					"rust",
+					"json",
+					"yaml",
+					"python",
+					"html",
+					"tsx",
+					"prisma",
+					"bash",
+				},
+				highlight = {
+					enable = true,
+					additional_vim_regex_highlighting = false,
+				},
+				indent = { enable = true },
+				incremental_selection = { enable = true },
+			})
+			vim.filetype.add({
+				filename = {
+					[".env"] = "dotenv",
+				},
+				pattern = {
+					["%.env%.[%w_.-]+"] = "dotenv", -- .env.local, .env.production, .env.test ...
+				},
+			})
+			vim.treesitter.language.register("bash", "dotenv")
 		end,
 	},
 }
