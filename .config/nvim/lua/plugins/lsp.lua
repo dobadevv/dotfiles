@@ -128,8 +128,18 @@ return {
 			})
 
 			-- TypeScript LSP
+			local merge_conflict_marker_code = 1185
 			vim.lsp.config("ts_ls", {
 				capabilities = capabilities,
+				handlers = {
+					-- git-conflict already highlights conflicts, so drop "Merge conflict marker encountered."
+					["textDocument/publishDiagnostics"] = function(err, result, ctx)
+						result.diagnostics = vim.tbl_filter(function(diagnostic)
+							return diagnostic.code ~= merge_conflict_marker_code
+						end, result.diagnostics)
+						vim.lsp.handlers["textDocument/publishDiagnostics"](err, result, ctx)
+					end,
+				},
 			})
 
 			-- ESLint LSP - Shows inline diagnostics

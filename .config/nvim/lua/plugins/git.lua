@@ -20,6 +20,37 @@ return {
 	},
 	{
 		"sindrets/diffview.nvim",
+		init = function()
+			-- Claude Code's dark-theme diff palette
+			local function set_claude_diff_colors()
+				vim.api.nvim_set_hl(0, "ClaudeDiffAdded", { bg = "#225c2b" })
+				vim.api.nvim_set_hl(0, "ClaudeDiffAddedDim", { bg = "#47584a" })
+				vim.api.nvim_set_hl(0, "ClaudeDiffAddedWord", { bg = "#38a660" })
+				vim.api.nvim_set_hl(0, "ClaudeDiffRemoved", { bg = "#7a2936" })
+				vim.api.nvim_set_hl(0, "ClaudeDiffRemovedDim", { bg = "#69484d" })
+				vim.api.nvim_set_hl(0, "ClaudeDiffRemovedWord", { bg = "#b3596b" })
+				vim.api.nvim_set_hl(0, "ClaudeDiffFiller", { fg = "#45475a" })
+			end
+			set_claude_diff_colors()
+			vim.api.nvim_create_autocmd("ColorScheme", { callback = set_claude_diff_colors })
+		end,
+		opts = {
+			hooks = {
+				-- Red on the old side, green on the new side, like Claude Code; merge layouts keep the defaults
+				diff_buf_win_enter = function(_, winid, ctx)
+					if not ctx.layout_name:match("^diff2") then
+						return
+					end
+					local tone = ctx.symbol == "a" and "Removed" or "Added"
+					vim.wo[winid].winhighlight = table.concat({
+						"DiffAdd:ClaudeDiff" .. tone,
+						"DiffChange:ClaudeDiff" .. tone .. "Dim",
+						"DiffText:ClaudeDiff" .. tone .. "Word",
+						"DiffDelete:ClaudeDiffFiller",
+					}, ",")
+				end,
+			},
+		},
 		keys = {
 			{ "<leader>gv", "<CMD>DiffviewOpen<CR>", silent = true, desc = "Open diff view" },
 			{ "<leader>gc", "<CMD>DiffviewClose<CR>", silent = true, desc = "Close diff view" },
@@ -31,7 +62,24 @@ return {
 		"akinsho/git-conflict.nvim",
 		version = "*",
 		lazy = false,
-		config = true,
+		init = function()
+			-- VS Code's merge conflict colors, sampled from a screenshot; the plugin only sets these as defaults
+			local function set_vscode_conflict_colors()
+				vim.api.nvim_set_hl(0, "GitConflictCurrentLabel", { bg = "#526857" })
+				vim.api.nvim_set_hl(0, "GitConflictCurrent", { bg = "#37423f" })
+				vim.api.nvim_set_hl(0, "GitConflictAncestorLabel", { bg = "#4e5163" })
+				vim.api.nvim_set_hl(0, "GitConflictAncestor", { bg = "#353642" })
+				vim.api.nvim_set_hl(0, "GitConflictIncoming", { bg = "#303951" })
+				vim.api.nvim_set_hl(0, "GitConflictIncomingLabel", { bg = "#45557a" })
+				vim.api.nvim_set_hl(0, "GitConflictCodeLens", { fg = "#747990" })
+			end
+			set_vscode_conflict_colors()
+			vim.api.nvim_create_autocmd("ColorScheme", { callback = set_vscode_conflict_colors })
+		end,
+		config = function()
+			require("git-conflict").setup()
+			require("config.conflict_codelens").setup()
+		end,
 		keys = {
 			{ "<leader>gxn", "<CMD>GitConflictNextConflict<CR>", silent = true, desc = "Move to the next conflict" },
 			{ "<leader>gxp", "<CMD>GitConflictPrevConflict<CR>", silent = true, desc = "Move to the previous conflict" },

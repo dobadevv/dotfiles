@@ -119,3 +119,33 @@ private toComputedFields(params: ToComputedFieldsParams): LabComputedFields {
   // ...
 }
 ```
+
+## Type Guards over Double Casts
+
+Never narrow a value with `as unknown as T`. When the real type depends on a runtime check (a status code, a discriminant field), write a type guard that performs the check and returns a `value is T` predicate, then branch on it.
+
+```ts
+// Don't: the cast is detached from the check that justifies it
+if (response.status === HttpStatus.BAD_REQUEST) {
+  const { error } = response.data as unknown as LabResultRule__Error__Response;
+  throw new BadRequestException({ errorCode: error.code, message: error.message });
+}
+```
+
+```ts
+// Do: the guard ties the narrowing to the check
+if (this.isBadRequestError(response)) {
+  const { error } = response.data;
+  throw new BadRequestException({ errorCode: error.code, message: error.message });
+}
+
+private isBadRequestError(
+  response: AxiosResponse
+): response is AxiosResponse<LabResultRule__Error__Response> {
+  return response.status === HttpStatus.BAD_REQUEST;
+}
+```
+
+- Name the guard as a boolean question (`isBadRequestError`, `hasErrorBody`) and follow the One Style per File rule: a `private` method in a class, a function in a `helpers` file otherwise.
+- Keep the guard's body to the runtime check that justifies the narrowing; never return `true` unconditionally.
+- Reach for `as unknown as T` only when no runtime check can express the narrowing (e.g. test doubles), and add a comment saying why.
