@@ -1,1 +1,7 @@
 theme: catppuccin-mocha
+collection_browser:
+  show_on_startup: false
+keymap:
+  search-requests: ctrl+g
+  toggle-collection: ctrl+b
+  send-request: ctrl+e

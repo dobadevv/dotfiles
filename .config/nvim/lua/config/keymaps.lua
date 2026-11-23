@@ -1,6 +1,3 @@
--- Exit from terminal mode
-vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
-
 -- Toggle wrap text
 vim.keymap.set("n", "<leader>tw", "<cmd>set wrap!<CR>", { silent = true, desc = "Toggle line wrap" })
 
@@ -55,9 +52,16 @@ vim.keymap.set("n", "<leader>|", "<cmd>vsplit<CR>", { silent = true, desc = "Spl
 vim.keymap.set("n", "<leader>-", "<cmd>split<CR>", { silent = true, desc = "Split horizontally" })
 
 -- Buffer
-vim.keymap.set("n", "<S-w>", "<CMD>bd<CR>", { silent = true, desc = "Close current buffer" })
+vim.keymap.set("n", "<S-w>", function()
+  local isLastBuffer = #vim.fn.getbufinfo({ buflisted = 1 }) <= 1
+  vim.cmd("bd")
+  if isLastBuffer then
+    vim.cmd("Dashboard")
+  end
+end, { silent = true, desc = "Close current buffer" })
 vim.keymap.set("n", "<S-n>", "<CMD>bnext<CR>", { silent = true, desc = "Next buffer" })
 vim.keymap.set("n", "<S-p>", "<CMD>bprev<CR>", { silent = true, desc = "Previous buffer" })
+vim.keymap.set("n", "<leader>O", "<CMD>silent! %bd | Dashboard<CR>", { silent = true, desc = "Close all buffers" })
 
 -- Copy
 -- Relative path from the working directory (cwd), in the format Claude Code understands: @path
@@ -80,17 +84,23 @@ vim.keymap.set("n", "<leader>cl", function()
   copy(("@%s:%d"):format(rel_path(), vim.fn.line(".")))
 end, { desc = "Copy @file:line" })
 
--- 3. Copy visual selection: @path:START-END plus the code itself
+-- 3. Copy visual selection as @path:START-END
 vim.keymap.set("v", "<leader>cs", function()
   local s, e = vim.fn.line("v"), vim.fn.line(".")
   if s > e then s, e = e, s end
-  local lines = vim.api.nvim_buf_get_lines(0, s - 1, e, false)
-  local ft = vim.bo.filetype
-  local text = ("@%s:%d-%d\n```%s\n%s\n```"):format(
-    rel_path(), s, e, ft, table.concat(lines, "\n"))
-  copy(text, ("Copied %d lines"):format(#lines))
+  copy(("@%s:%d-%d"):format(rel_path(), s, e), ("Copied path for %d lines"):format(e - s + 1))
   vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "n", false)
 end, { desc = "Copy selection for Claude Code" })
+
+-- 3b. Copy visual selection as a fenced code block
+vim.keymap.set("v", "<leader>cY", function()
+  local s, e = vim.fn.line("v"), vim.fn.line(".")
+  if s > e then s, e = e, s end
+  local lines = vim.api.nvim_buf_get_lines(0, s - 1, e, false)
+  local text = ("```%s\n%s\n```"):format(vim.bo.filetype, table.concat(lines, "\n"))
+  copy(text, ("Copied code block (%d lines)"):format(#lines))
+  vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "n", false)
+end, { desc = "Copy selection with code for Claude Code" })
 
 -- 4. Copy the whole function (Treesitter)
 local function current_function_node()

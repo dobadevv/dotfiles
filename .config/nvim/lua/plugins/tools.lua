@@ -1,3 +1,17 @@
+-- one terminal per command, so reopening a tool resumes its session instead of spawning a new one
+local tool_terminals = {}
+
+local function toggle_tool(cmd)
+	tool_terminals[cmd] = tool_terminals[cmd]
+		or require("toggleterm.terminal").Terminal:new({
+			cmd = cmd,
+			direction = "float",
+			hidden = true, -- keep tools out of :ToggleTerm so <C-q> only manages plain shells
+			close_on_exit = true,
+		})
+	tool_terminals[cmd]:toggle()
+end
+
 return {
 	{
 		"folke/lazy.nvim",
@@ -35,9 +49,35 @@ return {
 		version = "*",
 		cmd = { "ToggleTerm", "TermExec" },
 		keys = {
-			{ "<leader>tt", "<cmd>ToggleTerm direction=float<cr>", desc = "Terminal float" },
+			{ "<C-q>", "<cmd>ToggleTerm direction=float<cr>", desc = "Terminal float" },
+			{ "<C-q>", "<cmd>hide<cr>", mode = "t", desc = "Hide terminal" },
 			{ "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", desc = "Terminal horizontal" },
 			{ "<leader>tv", "<cmd>ToggleTerm direction=vertical size=60<cr>", desc = "Terminal vertical" },
+			{
+				"<leader>lp",
+				function()
+					-- gitignored: returns { name = "path/to/.posting", ... }
+					local ok, collections = pcall(require, "config.posting_collections")
+					if not ok then
+						vim.notify("Missing lua/config/posting_collections.lua", vim.log.levels.WARN)
+						return
+					end
+					vim.ui.select(vim.tbl_keys(collections), { prompt = "Posting collection" }, function(project)
+						if not project then
+							return
+						end
+						toggle_tool("posting --collection " .. vim.fn.expand(collections[project]))
+					end)
+				end,
+				desc = "Open Posting",
+			},
+			{
+				"<leader>lc",
+				function()
+					toggle_tool("claude --dangerously-skip-permissions")
+				end,
+				desc = "Open Claude",
+			},
 		},
 		opts = {
 			direction = "float",

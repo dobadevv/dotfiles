@@ -51,32 +51,79 @@ return {
 	},
 
 	{
-		"saghen/blink.cmp",
-		version = "1.*",
-		dependencies = { "L3MON4D3/LuaSnip" },
-		opts = {
-			snippets = { preset = "luasnip" },
-			keymap = {
-				-- blink merges presets by keycode, and <Tab> == <C-i>, so any preset with <Tab> drops <C-i>.
-				preset = "none",
-				["<C-i>"] = { "show", "show_documentation", "hide_documentation" },
-				["<C-n>"] = { "select_next", "fallback" },
-				["<C-p>"] = { "select_prev", "fallback" },
-				["<C-y>"] = { "select_and_accept", "fallback" },
-				["<C-e>"] = { "hide", "fallback" },
-				["<C-b>"] = { "scroll_documentation_up", "fallback" },
-				["<C-f>"] = { "scroll_documentation_down", "fallback" },
-				["<A-j>"] = { "select_next", "snippet_forward", "fallback" },
-				["<A-k>"] = { "select_prev", "snippet_backward", "fallback" },
-				["<CR>"] = { "accept", "fallback" },
-			},
+		"hrsh7th/nvim-cmp",
+		event = "InsertEnter",
+		dependencies = {
+			"L3MON4D3/LuaSnip",
+			"saadparwaiz1/cmp_luasnip",
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-buffer",
 		},
+		config = function()
+			local cmp = require("cmp")
+			local luasnip = require("luasnip")
+
+			local function select_or_jump(direction)
+				return function(fallback)
+					if cmp.visible() then
+						if direction > 0 then cmp.select_next_item() else cmp.select_prev_item() end
+					elseif luasnip.jumpable(direction) then
+						luasnip.jump(direction)
+					else
+						fallback()
+					end
+				end
+			end
+
+			local function scroll_docs(delta)
+				return function(fallback)
+					if cmp.visible_docs() then cmp.scroll_docs(delta) else fallback() end
+				end
+			end
+
+			cmp.setup({
+				snippet = {
+					expand = function(args) luasnip.lsp_expand(args.body) end,
+				},
+				sources = cmp.config.sources({
+					{ name = "nvim_lsp" },
+					{ name = "luasnip" },
+					{ name = "path" },
+				}, {
+					{ name = "buffer" },
+				}),
+				mapping = {
+					-- <C-i> only differs from <Tab> because Ghostty sends it as CSI u (see ghostty/config).
+					["<C-i>"] = cmp.mapping(function()
+						if not cmp.visible() then
+							cmp.complete()
+						elseif cmp.visible_docs() then
+							cmp.close_docs()
+						else
+							cmp.open_docs()
+						end
+					end, { "i", "s" }),
+					["<C-n>"] = cmp.mapping.select_next_item(),
+					["<C-p>"] = cmp.mapping.select_prev_item(),
+					["<Down>"] = cmp.mapping.select_next_item(),
+					["<Up>"] = cmp.mapping.select_prev_item(),
+					["<C-y>"] = cmp.mapping.confirm({ select = true }),
+					["<C-e>"] = cmp.mapping.abort(),
+					["<C-b>"] = cmp.mapping(scroll_docs(-4), { "i", "s" }),
+					["<C-f>"] = cmp.mapping(scroll_docs(4), { "i", "s" }),
+					["<A-j>"] = cmp.mapping(select_or_jump(1), { "i", "s" }),
+					["<A-k>"] = cmp.mapping(select_or_jump(-1), { "i", "s" }),
+					["<CR>"] = cmp.mapping.confirm({ select = false }),
+				},
+			})
+		end,
 	},
 
 	{
 		"neovim/nvim-lspconfig",
 		lazy = false,
-		dependencies = { "saghen/blink.cmp" },
+		dependencies = { "hrsh7th/cmp-nvim-lsp" },
 		keys = {
 			{ "<leader>gd", go_to_definition, silent = true, desc = "Go to definition" },
 			{ "<leader>gr", function() require("telescope.builtin").lsp_references() end, silent = true, desc = "Go to references" },
@@ -90,7 +137,7 @@ return {
 			{ "<leader>ts", "<cmd>Telescope lsp_document_symbols<CR>" },
 		},
 		config = function()
-			local capabilities = require("blink.cmp").get_lsp_capabilities()
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 			-- Lua LSP
 			vim.lsp.config("lua_ls", {

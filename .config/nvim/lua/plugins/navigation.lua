@@ -1,21 +1,48 @@
 local function find_files()
 	require("telescope.builtin").find_files({
-		hidden = true,
-		no_ignore = true,
-		no_ignore_parent = true,
+		-- excluded in fd itself: file_ignore_patterns only filters after the full listing
+		find_command = {
+			"fd", "--type", "f", "--hidden", "--no-ignore",
+			"--exclude", ".git",
+			"--exclude", "node_modules",
+			"--exclude", "dist",
+			"--exclude", ".next",
+			"--exclude", "coverage",
+			"--exclude", ".venv",
+			"--exclude", "__pycache__",
+			"--exclude", ".codegraph",
+			"--exclude", ".serena",
+		},
 	})
 end
 
 local function live_grep()
 	require("telescope.builtin").live_grep({
+		debounce = 150,
 		additional_args = {
 			"--hidden",
-			"--no-ignore",
+			"--max-filesize=1M",
+			"--max-columns=300",
+			"--max-columns-preview",
+			"--glob", "!.git/**",
 			"--glob", "!node_modules/**",
 			"--glob", "!dist/**",
+			"--glob", "!.next/**",
+			"--glob", "!coverage/**",
+			"--glob", "!.venv/**",
+			"--glob", "!__pycache__/**",
+			"--glob", "!.codegraph/**",
+			"--glob", "!.serena/**",
 			"--glob", "!*.test.*",
 			"--glob", "!*.spec.*",
 			"--glob", "!pnpm-lock.yaml",
+			"--glob", "!package-lock.json",
+			"--glob", "!yarn.lock",
+			"--glob", "!*.min.*",
+			"--glob", "!*.map",
+			"--glob", "!*.svg",
+			"--glob", "!*.snap",
+			"--glob", "!*.log",
 			"--glob", "!*.md",
 		},
 	})
@@ -25,7 +52,10 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "v0.2.0",
-		dependencies = { "nvim-lua/plenary.nvim" },
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+		},
 		lazy = false,
 		keys = {
 			{ "<leader>ff", find_files, silent = true, desc = "Find files" },
@@ -69,6 +99,7 @@ return {
 					},
 				},
 			})
+			require("telescope").load_extension("fzf")
 		end,
 	},
 
