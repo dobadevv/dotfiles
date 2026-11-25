@@ -1,0 +1,14 @@
+{
+  "place": "none",
+  "title": "Worktree",
+  "overlay": {
+    "kind": "dialog",
+    "width": 460,
+    "height": 280,
+    "frame": "none"
+  },
+  "cloned_from": {
+    "name": "worktree",
+    "version": "0.1.15"
+  }
+}

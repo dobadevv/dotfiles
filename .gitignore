@@ -18,3 +18,19 @@
 
 .zshrc.secret
 .serena
+
+# herdr-app: keep only personal config; the app rewrites the rest on start
+.config/herdr-app/*
+!.config/herdr-app/settings.json
+!.config/herdr-app/keys.json
+!.config/herdr-app/programs.json
+!.config/herdr-app/layouts/
+.config/herdr-app/layouts/.state/
+.config/herdr-app/layouts/main.json
+.config/herdr-app/layouts/terminals.json
+.config/herdr-app/layouts/win98.*
+!.config/herdr-app/mods/
+.config/herdr-app/mods/*
+!.config/herdr-app/mods/omarchy-*/
+!.config/herdr-app/backgrounds/
+.config/herdr/*.sock
